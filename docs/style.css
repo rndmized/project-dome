@@ -1,0 +1,231 @@
+/*
+Design by TEMPLATED
+http://templated.co
+Released for free under the Creative Commons Attribution License
+
+Name       : Artifice
+Description: A two-column, fixed-width design with a dark color scheme.
+Version    : 1.0
+Released   : 20120813
+*/
+
+* {
+	padding: 0;
+	margin: 0;
+}
+
+body {
+	color: #AFAFAF;
+	background: #040606 url(images/img01.gif) repeat-x top left;
+	line-height: 2em;
+	font-size: 12pt;
+}
+
+body,input {
+	font-family: 'Ubuntu Condensed', sans-serif;
+}
+
+br.clearfix {
+	clear: both;
+}
+
+a {
+	text-decoration: underline;
+	color: #E3E3E3;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+strong {
+	color: #D9D9D9;
+}
+
+
+h1,h2,h3,h4 {
+	font-weight: normal;
+	text-transform: uppercase;
+}
+
+h2 {
+	font-size: 1.75em;
+}
+
+h2,h3,h4 {
+	color: #E3E3E3;
+	font-family: Kreon, sans-serif;
+	margin-bottom: 1.25em;
+}
+
+h3 {
+	font-size: 1.5em;
+}
+
+h4 {
+	font-size: 1.25em;
+}
+
+img.alignleft {
+	margin: 5px 20px 20px 0;
+	float: left;
+}
+
+img.aligntop {
+	margin: 5px 0 20px 0;
+}
+
+p {
+	margin-bottom: 1.75em;
+}
+
+ul {
+	margin-bottom: 1.75em;
+}
+
+ul h4 {
+	margin-bottom: 0.4em;
+}
+
+.box {
+	margin: 0 0 25px 0;
+	overflow: hidden;
+}
+
+#content {
+	width: 420px;
+	padding: 0;
+	float: left;
+}
+
+#footer {
+	padding: 0 0 90px 0;
+	text-align: center;
+	color: #555;
+}
+
+#footer a {
+	color: #707070;
+}
+
+#header {
+	width: 1100px;
+	padding: 40px;
+	position: relative;
+	height: 120px;
+}
+
+#logo {
+	height: 120px;
+	line-height: 120px;
+	top: 40px;
+	left: 40px;
+	position: absolute;
+}
+
+#logo a {
+	color: #FFF;
+	text-decoration: none;
+}
+
+#logo h1 {
+	font-size: 3.25em;
+	font-family: Kreon, sans-serif;
+}
+
+#menu {
+	position: absolute;
+	box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.05), inset 0px 3px 15px 0px rgba(0,0,0,0.5), 0px 1px 1px 0px rgba(255,255,255,0.08);
+	right: 40px;
+	top: 68px;
+	font-family: Kreon, sans-serif;
+	height: 70px;
+	line-height: 70px;
+}
+
+#menu a {
+	font-size: 1.25em;
+	text-transform: uppercase;
+	color: #fff;
+	text-decoration: none;
+}
+
+#menu ul {
+	padding: 0 20px 0 20px;
+	list-style: none;
+}
+
+#menu ul li {
+	display: inline;
+	padding: 0 20px 0 20px;
+}
+
+#page {
+	margin: 0;
+	width: 1100px;
+	position: relative;
+	padding: 70px 40px 0px 40px;
+}
+
+#page .section-list {
+	padding-left: 0;
+	list-style: none;
+}
+
+#page .section-list li {
+	clear: both;
+	padding: 25px 0 25px 0;
+}
+
+#page ul {
+	list-style: none;
+}
+
+#page ul li {
+	padding: 15px 0 15px 0;
+	border-top: dotted 1px #404040;
+}
+
+#page ul li.first {
+	padding-top: 0;
+	border-top: 0;
+}
+
+#col1 {
+	width: 195px;
+	float: left;
+	overflow: hidden;
+}
+
+#col2 {
+	width: 195px;
+	margin: 0 0 0 220px;
+	overflow: hidden;
+}
+
+#sidebar1 {
+	padding: 0;
+	margin: 0 0 0 445px;
+	width: 315px;
+}
+
+#sidebar2 {
+	width: 315px;
+	float: right;
+	padding: 0;
+}
+
+#splash {
+	height: 295px;
+	width: 1180px;
+	padding: 0;
+	position: relative;
+}
+
+#wrapper {
+	background: #000000 url(images/img02.gif) repeat-x top left;
+	margin: 75px auto 0 auto;
+	width: 1180px;
+	position: relative;
+	box-shadow: inset 0px 0px 30px 0px rgba(255,255,255,0.05), 0px 0px 30px 0px rgba(0,0,0,0.5);
+}
