@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         //Set Initial Zoom Distance
-        zoom = -4;
+        zoom = 1;
 
     }
 
