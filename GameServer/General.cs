@@ -6,7 +6,6 @@ namespace GameServer
     {
         public void InitServer()
         {
-            //Globals.mysql.MySQLInit();
             InitGameData();
             Globals.network.InitTCP();
         }

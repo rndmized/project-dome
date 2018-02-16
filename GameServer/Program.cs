@@ -30,11 +30,7 @@ namespace GameServer
                     consoleRunning = false;
                     return;
                 }
-
-                else
-                {
-
-                }
+				
             }
         }
     }

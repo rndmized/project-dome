@@ -1,6 +1,7 @@
 ﻿using ByteBufferDLL;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GameServer
 {
@@ -16,15 +17,30 @@ namespace GameServer
 
         public void HandleData(int index, byte[] data)
         {
+			Console.WriteLine("Entrou id "+index);
+			Debug.WriteLine(data);
             int packetnum;
             Packet_ Packet;
 			ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteBytes(data);
             packetnum = buffer.ReadInt();
-            buffer = null;
+            //buffer = null;
 
             if (packetnum == 0)
                 return;
+
+			switch (packetnum)
+			{
+				case (int)ServerEnums.ServerPackets.SPlayerMovement:
+					/*string tst = buffer.ReadString(); 
+					Debug.WriteLine(tst);*/
+					HandlePlayerMovement((int)ServerEnums.ServerPackets.SPlayerMovement, buffer.ReadInt(), buffer.ToArray());
+					break;
+				case (int)ServerEnums.ServerPackets.SAlertSyncGame:
+					break;
+				default:
+					return;
+			}
 
             if (Packets.TryGetValue(packetnum, out Packet))
             {
@@ -32,5 +48,17 @@ namespace GameServer
             }
 
         }
-    }
+
+		public void HandlePlayerMovement(int option, int playerID, byte[] data) 
+		{
+			ByteBuffer buffer = new ByteBuffer();
+
+			buffer.WriteInt(option);
+			buffer.WriteInt(playerID);
+			buffer.WriteBytes(data);
+
+			Globals.networkSendData.SendDataToAllBut(playerID, buffer.ToArray());
+		}
+
+	}
 }

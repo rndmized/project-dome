@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace GameServer
 {
-	class Enums
+	class ServerEnums
 	{
 		public enum ServerPackets
 		{
-			SAlertMsg = 1, 
-
+			SAlertSyncGame = 1, 
+			SPlayerMovement = 2
 		}
 
 		public enum ClientPackets

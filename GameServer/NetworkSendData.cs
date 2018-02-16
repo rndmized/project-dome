@@ -33,13 +33,13 @@ namespace GameServer
             }
         }
 
-        public void SendDataToAllBut(int index, byte[] data)
+        public void SendDataToAllBut(int playerId, byte[] data)
         {
             for (int i = 1; i < Constants.MAX_PLAYERS; i++)
             {
                 if (Globals.Clients[i].Socket != null)
                 {
-                    if (i != index)
+                    if (i != playerId)
                     {
                         SendDataTo(i, data);
                     }
@@ -104,6 +104,7 @@ namespace GameServer
                 }
             }
         }
+		
 
 		public void SendIngame(int index)
 		{
