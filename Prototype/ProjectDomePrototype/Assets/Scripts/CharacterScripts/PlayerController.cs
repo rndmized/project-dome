@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Networking;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -10,8 +11,8 @@ public class PlayerController : MonoBehaviour {
     public float jumpDist = 3.0f;
     public float gravity = 20f;
 
-	bool isLocalPlayer = false;
-
+	Network net;
+	
     private Vector2 input;
     private float angle;
     private float verticalVelocity;
@@ -35,19 +36,11 @@ public class PlayerController : MonoBehaviour {
 
     void Update()
     {
-		if (int.Parse(character.name) == Network.playerID)
-		{
-			isLocalPlayer = true;
-			GetInput();
+		GetInput();
 			ApplyGravity();
 			Move();
-		}
-		if (frameCounter == 60 && isLocalPlayer)
-		{
-			frameCounter = 0;
-			Network
-		}
-		frameCounter++;
+		
+		
 	}
 
 
