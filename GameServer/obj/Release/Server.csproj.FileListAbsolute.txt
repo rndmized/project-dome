@@ -1,0 +1,11 @@
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\obj\Release\Server.csprojResolveAssemblyReference.cache
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\obj\Release\Server.csproj.CoreCompileInputs.cache
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\bin\Release\Server.exe.config
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\bin\Release\Server.exe
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\bin\Release\Server.pdb
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\bin\Release\ByteBufferDLL.dll
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\bin\Release\EnumsServer.dll
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\bin\Release\ByteBufferDLL.pdb
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\bin\Release\EnumsServer.pdb
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\obj\Release\Server.exe
+c:\users\pedro\documents\visual studio 2017\Projects\Server\Server\obj\Release\Server.pdb
