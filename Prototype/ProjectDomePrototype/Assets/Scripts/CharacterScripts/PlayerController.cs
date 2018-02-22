@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
     public float jumpDist = 3.0f;
     public float gravity = 20f;
 
+	bool isLocalPlayer = false;
 
     private Vector2 input;
     private float angle;
@@ -21,7 +22,7 @@ public class PlayerController : MonoBehaviour {
     Transform character;
     CharacterController player;
 
-
+	int frameCounter = 0;
     //Initialize components
     void Start()
     {
@@ -34,11 +35,20 @@ public class PlayerController : MonoBehaviour {
 
     void Update()
     {
-
-            GetInput();
-            ApplyGravity();
-            Move();    
-    }
+		if (int.Parse(character.name) == Network.playerID)
+		{
+			isLocalPlayer = true;
+			GetInput();
+			ApplyGravity();
+			Move();
+		}
+		if (frameCounter == 60 && isLocalPlayer)
+		{
+			frameCounter = 0;
+			Network
+		}
+		frameCounter++;
+	}
 
 
     /* This function detects whether the player transfor is airborne and applies velocity downwards
