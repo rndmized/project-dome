@@ -1,0 +1,4 @@
+This file contains location of sources for the following files. 
+
+
+* **magecity**, **town01**, **town02**: [](http://www.lorestrome.com/pixel_archive/town.htm)
