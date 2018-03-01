@@ -1,0 +1,27 @@
+<div class="login-wrapper">
+  <form class="login" (ngSubmit)="logIn()">
+      <label class="title">
+          <h3 class="welcome">Welcome to</h3>
+          [Project Dome]
+          <h5 class="hint">Use your ID to sign in </h5>
+      </label>
+      <div class="login-group">
+          <div class="auth-source select">
+              <select id="login-auth-source-1">
+                  <option>Administrator</option>
+              </select>
+          </div>
+          <input class="username" type="text" id="login_username" name="username" placeholder="Username" [(ngModel)]="user.username" required>
+          <input class="password" type="password" id="login_password" name="password" placeholder="Password" [(ngModel)]="user.password" required>
+          <div class="checkbox">
+              <input type="checkbox" id="rememberme">
+              <label for="rememberme">
+                  Remember me
+              </label>
+          </div>
+          <button [disabled]="loading" class="btn btn-primary">Login</button>
+          <div><img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" /></div>
+        <div *ngIf="error" class="alert alert-danger">{{error}}</div>  
+      </div>
+  </form>
+</div>
