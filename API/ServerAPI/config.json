@@ -1,0 +1,3 @@
+{
+    "database": "mongodb://user:user@ds119020.mlab.com:19020/bem-test"
+}

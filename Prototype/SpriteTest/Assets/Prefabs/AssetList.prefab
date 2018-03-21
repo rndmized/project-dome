@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1538427547337812}
+  m_IsPrefabParent: 1
+--- !u!1 &1538427547337812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4750679047499418}
+  - component: {fileID: 114252108433287856}
+  m_Layer: 0
+  m_Name: AssetList
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4750679047499418
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1538427547337812}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.86487645, y: 1.3002465, z: -0.5175399}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114252108433287856
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1538427547337812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd89a7b6e10c88a449f09a7bd818115e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BodyStyle:
+  - {fileID: 9100000, guid: b3db884d3a2df0640b0b098d7fef08cf, type: 2}
+  HairStyles:
+  - {fileID: 9100000, guid: d1eac1ffe4810bd42addec61c9e6bbf0, type: 2}
+  - {fileID: 9100000, guid: f2d0c7d4491144749b6b6062555c2713, type: 2}
+  - {fileID: 9100000, guid: 71ea82efe3dd7de4f80aa9c86b8d6728, type: 2}
+  - {fileID: 9100000, guid: e5cd960adb847a24c9e65c13c6b7648e, type: 2}
+  - {fileID: 9100000, guid: b111220d4175eb049a6586400092f3d8, type: 2}
+  - {fileID: 9100000, guid: dfba8b5135da65444884aab5f6482f07, type: 2}
+  - {fileID: 9100000, guid: 61beb76baace97249a27abe4303bcf86, type: 2}
+  - {fileID: 9100000, guid: f08976ade5f1bbd418439728305bc73a, type: 2}
+  - {fileID: 9100000, guid: fe7c137737bc0594f9fa62fbeaf447c8, type: 2}
+  - {fileID: 9100000, guid: 66ec16ba967eff04eb5e220a87470f59, type: 2}
+  - {fileID: 9100000, guid: a0bc526bc5e9acb43adda827b439d47d, type: 2}
+  - {fileID: 9100000, guid: e7c6b4ec99f09814fbd93d3cd65cb5d4, type: 2}
+  - {fileID: 9100000, guid: 620bfe5c583d2014a97061a777912056, type: 2}
+  - {fileID: 9100000, guid: f7068bd104a0baa40b307796dac5da5e, type: 2}
+  ClothesStyles:
+  - {fileID: 9100000, guid: 084631d56c2cd14479be469b69ef82d1, type: 2}
+  - {fileID: 9100000, guid: a79ab5b2fa648cf4ca1b5ef1c1ce116a, type: 2}
+  - {fileID: 9100000, guid: 1d271eeeaa478304aa3d269002eaaf9b, type: 2}
+  - {fileID: 9100000, guid: 169534c37d7f92049b76b3b688d398e4, type: 2}
+  - {fileID: 9100000, guid: a617b63cc081ca04694a090947b1d11e, type: 2}
+  - {fileID: 9100000, guid: fbd6498400aea8d42ba0f0fd6d412556, type: 2}
+  - {fileID: 9100000, guid: a7046efe5fa9bbd45b5a7e668e40df6d, type: 2}
+  - {fileID: 9100000, guid: bfae45e04f5182a48b9ddf605c69b0c2, type: 2}

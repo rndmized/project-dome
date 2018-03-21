@@ -6,7 +6,7 @@ const logger = require('morgan'),
   bodyParser = require('body-parser'),
   mongoose = require('mongoose'), //Temporary mongo db
   helmet = require('helmet'), //Provides security
-  //config = require('./config.json'); FOR CONFIGURATIONS
+  config = require('./config.json'); //FOR DB CONFIGURATIONS
  
 const app = express();
 app.use(helmet())
@@ -25,7 +25,7 @@ var port = process.env.PORT || 3000;
 mongoose.Promise = global.Promise;
 mongoose.connect(config.database);
  
-//app.use(require('./ROUTES-FILE'));
+app.use(require('./routes'));
  
 http.createServer(app).listen(port, function (err) {
   console.log('listening in http://localhost:' + port);
