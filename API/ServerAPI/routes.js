@@ -2,8 +2,8 @@ const express = require('express');
 
 
 const app = module.exports = express.Router();
-const User = require('./users');
-
+const User = require('./models/User');
+const Character = require('./models/Character');
 
 app.post('/login', function (req, res) {
   let password = req.body.password;
@@ -14,6 +14,54 @@ app.post('/login', function (req, res) {
     return res.json({ "success": false, "msg": "Error while login" });
   }
 });
+
+
+
+app.post('/register', function (req, res) {
+  if (!req.body.username && !req.body.full_name && !req.body.email && !req.body.password) {
+    return res.status(400).send({ "success": false, "msg": "Blank fields on user." });
+  }
+  let newUser = new User({
+    username: req.body.username,
+    full_name: req.body.full_name,
+    email: req.body.email,
+    password: req.body.password,
+    admin:false
+  });
+
+  newUser.save(function (err) {
+    if (err) {
+      console.log("Unexpected Error: ", err);
+      return res.json({ "success": false, "msg": "Error while creating User", "error": err });
+    }
+    res.status(201).send({ "success": true, "msg": 'Successful created new User.' });
+  });
+});
+
+app.post('/createCharacter', function (req, res) {
+  if (!req.body.username && !req.body.char_name) {
+    return res.status(400).send({ "success": false, "msg": "Missing data for character creation." });
+  }
+
+let character =  new Character({
+  userID: req.body.username,
+  char_name: req.body.char_name,
+  char_hairId: req.body.char_hairId,
+  char_bodyId: req.body.char_bodyId,
+  char_clothesId: req.body.char_clothesId
+
+});
+
+character.save(function (err) {
+  if (err) {
+    console.log("Unexpected Error: ", err);
+    return res.json({ "success": false, "msg": "Error while creating Character", "error": err });
+  }
+  res.status(201).send({ "success": true, "msg": 'Successful created new Character.' });
+});
+
+});
+
 
 
 

@@ -2,7 +2,7 @@
   "name": "serverapi",
   "version": "1.0.0",
   "description": "Login and Management Server for Project Dome",
-  "main": "API.js",
+  "main": "LoginServer.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
