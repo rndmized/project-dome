@@ -27,6 +27,11 @@ public class SignInScript : MonoBehaviour {
         StartCoroutine(Upload());
     }
 
+    public void ReturnToLogin()
+    {
+        SceneManager.LoadScene("LoginScene");
+    }
+
     IEnumerator Upload()
     {
         // Create appropriate structure to send scores over the network
