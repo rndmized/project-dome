@@ -1,0 +1,12 @@
+C:\Users\Pedro\Desktop\MMORPG Tutorial\Server\ByteBufferDLL\bin\Debug\ByteBufferDLL.dll
+C:\Users\Pedro\Desktop\MMORPG Tutorial\Server\ByteBufferDLL\bin\Debug\ByteBufferDLL.pdb
+C:\Users\Pedro\Desktop\MMORPG Tutorial\Server\ByteBufferDLL\obj\Debug\ByteBufferDLL.csprojResolveAssemblyReference.cache
+C:\Users\Pedro\Desktop\MMORPG Tutorial\Server\ByteBufferDLL\obj\Debug\ByteBufferDLL.csproj.CoreCompileInputs.cache
+C:\Users\Pedro\Desktop\MMORPG Tutorial\Server\ByteBufferDLL\obj\Debug\ByteBufferDLL.dll
+C:\Users\Pedro\Desktop\MMORPG Tutorial\Server\ByteBufferDLL\obj\Debug\ByteBufferDLL.pdb
+C:\Users\Pedro\Desktop\GameServer\Server\ByteBufferDLL\obj\Debug\ByteBufferDLL.csprojResolveAssemblyReference.cache
+C:\Users\Pedro\Desktop\GameServer\Server\ByteBufferDLL\obj\Debug\ByteBufferDLL.csproj.CoreCompileInputs.cache
+C:\Users\Pedro\Desktop\GameServer\Server\ByteBufferDLL\obj\Debug\ByteBufferDLL.dll
+C:\Users\Pedro\Desktop\GameServer\Server\ByteBufferDLL\obj\Debug\ByteBufferDLL.pdb
+C:\Users\Pedro\Desktop\GameServer\Server\ByteBufferDLL\bin\Debug\ByteBufferDLL.dll
+C:\Users\Pedro\Desktop\GameServer\Server\ByteBufferDLL\bin\Debug\ByteBufferDLL.pdb
