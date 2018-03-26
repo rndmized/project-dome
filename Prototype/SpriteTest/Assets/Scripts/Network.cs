@@ -136,9 +136,9 @@ public class Network : MonoBehaviour
 
 
 		Character NPC_Char = ScriptableObject.CreateInstance<Character>();
-		List<AnimatorController> HairStyles;
-		List<AnimatorController> ClothesStyles;
-		List<AnimatorController> BodyStyle;
+		List<RuntimeAnimatorController> HairStyles;
+		List<RuntimeAnimatorController> ClothesStyles;
+		List<RuntimeAnimatorController> BodyStyle;
 		NPC_Char = ScriptableObject.CreateInstance<Character>();
 		HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
 		ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;
@@ -204,9 +204,9 @@ public class Network : MonoBehaviour
 	public void InstantiatePlayer(int clothe, int hair, int body)
 	{
 		Character NPC_Char;
-		List<AnimatorController> HairStyles;
-		List<AnimatorController> ClothesStyles;
-		List<AnimatorController> BodyStyle;
+		List<RuntimeAnimatorController> HairStyles;
+		List<RuntimeAnimatorController> ClothesStyles;
+		List<RuntimeAnimatorController> BodyStyle;
 
 		NPC_Char = ScriptableObject.CreateInstance<Character>();
 		HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
