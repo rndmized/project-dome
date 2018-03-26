@@ -21,12 +21,22 @@ public class CharacterRenderer : MonoBehaviour {
     /// On start set Reference to GameObject. Find child Object "GFX" and set children values to Character's object attached values.
     /// </summary>
     void Start () {
+        init();
+    }
 
+    private void init()
+    {
         player = GetComponent<Transform>();
         player.GetComponent<Transform>().Find("GFX").GetComponent<Transform>().Find("Hair").GetComponent<Animator>().runtimeAnimatorController = character.char_headAnimator;
         player.GetComponent<Transform>().Find("GFX").GetComponent<Transform>().Find("Body").GetComponent<Animator>().runtimeAnimatorController = character.char_bodyAnimator;
         player.GetComponent<Transform>().Find("GFX").GetComponent<Transform>().Find("Clothes").GetComponent<Animator>().runtimeAnimatorController = character.char_clothesAnimator;
+
     }
-	
+
+    void FixedUpdate()
+    {
+        init();
+    }
+
 
 }

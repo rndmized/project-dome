@@ -35,35 +35,28 @@ public class LoginScript : MonoBehaviour {
         formFields.Add("username", usernameInputField.text);
         formFields.Add("password", passwordInputField.text);
         // Create http post request
-        UnityWebRequest www = UnityWebRequest.Post("http://localhost:3000/login", formFields);
+        UnityWebRequest http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress(), formFields);
 
         // Await for response
-        yield return www.SendWebRequest();
+        yield return http.SendWebRequest();
         // Log error, if no error return to main menu.
-        if (www.isNetworkError || www.isHttpError)
+        if (http.isNetworkError || http.isHttpError)
         {
-            Debug.Log(www.error);
+            Debug.Log(http.error);
         }
         else
         {
-            LoginInfo log = JsonUtility.FromJson<LoginInfo>(www.downloadHandler.text);
+            LoginInfo log = JsonUtility.FromJson<LoginInfo>(http.downloadHandler.text);
             Debug.Log(log.success);
 
             if (log.success == true)
             {
+                PlayerProfile.uID = usernameInputField.text;
                 SceneManager.LoadScene("Test1");
             }
             
         }
     }
-
-}
-
-
-[System.Serializable]
-public class LoginInfo
-{
-    public bool success;
 
 }
 

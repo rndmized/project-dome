@@ -11,10 +11,12 @@ public class PlayerController : MonoBehaviour {
 
 
     private Vector2 input;
+    private float angle;
     private float verticalVelocity;
-    
+    private Quaternion targetRotation;
+
     //References to player transform and CharacterController components.
-    Transform character;
+    Transform cam, character;
     CharacterController player;
 
     //References to animators
@@ -28,6 +30,7 @@ public class PlayerController : MonoBehaviour {
     {
         character = GetComponent<Transform>();
         player = character.GetComponent<CharacterController>();
+        cam = Camera.main.transform;
     }
 
 
@@ -37,6 +40,8 @@ public class PlayerController : MonoBehaviour {
             GetInput();
             Animate();
             ApplyGravity();
+            CalculateDirection();
+            Rotate();
             Move();    
     }
 
@@ -79,6 +84,23 @@ public class PlayerController : MonoBehaviour {
     {
             input.x = Input.GetAxis("Horizontal");
             input.y = Input.GetAxis("Vertical");
+    }
+
+
+    // Calculate angle in which the player should face to.
+    void CalculateDirection()
+    {
+        angle = Mathf.Atan2(character.position.x, character.position.z);
+        angle = Mathf.Rad2Deg * angle;
+        angle = cam.eulerAngles.y;
+
+    }
+
+    // rotate Y axis player to face correct direction.
+    void Rotate()
+    {
+        targetRotation = Quaternion.Euler(0, angle, 0);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
     }
 
 

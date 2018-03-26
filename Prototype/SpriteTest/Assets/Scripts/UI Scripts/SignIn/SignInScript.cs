@@ -41,7 +41,7 @@ public class SignInScript : MonoBehaviour {
         formFields.Add("email",emailInputField.text);
         formFields.Add("full_name",fullnameInputField.text);
         // Create http post request
-        UnityWebRequest www = UnityWebRequest.Post("http://localhost:3000/register", formFields);
+        UnityWebRequest www = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress() +"/register", formFields);
 
         // Await for response
         yield return www.SendWebRequest();
@@ -64,10 +64,3 @@ public class SignInScript : MonoBehaviour {
     }
 }
 
-[System.Serializable]
-public class AccountInfo
-{
-    public bool success;
-    public string message;
-
-}
