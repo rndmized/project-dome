@@ -13,5 +13,9 @@ namespace ServerEcho
 		public float cX { get; set; }
 		public float cY { get; set; }
 		public float cZ { get; set; }
+
+		public int head { get; set; }
+		public int body { get; set; }
+		public int cloths { get; set; }
 	}
 }

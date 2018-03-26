@@ -5,7 +5,8 @@ using UnityEngine;
 /// <summary>
 /// Test class to Spawn Characters
 /// </summary>
-public class SpawnController : MonoBehaviour {
+public class SpawnController : MonoBehaviour
+{
 
     public GameObject NPC;
 
@@ -19,7 +20,8 @@ public class SpawnController : MonoBehaviour {
     List<RuntimeAnimatorController> BodyStyle;
 
     // Use this for initialization
-    void Start () {
+    void Start ()
+	{
 
         /*
             Initialise the list references.
@@ -34,7 +36,8 @@ public class SpawnController : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
 
         /*
       
@@ -55,4 +58,5 @@ public class SpawnController : MonoBehaviour {
         }
 		
 	}
+
 }

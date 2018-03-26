@@ -21,16 +21,16 @@ namespace ServerEcho
 			p[0] = new Player();
 			p[0].cName = "ubaduba";
 			p[0].uName = "Shadow";
-			p[0].head = 1;
-			p[0].body = 1;
-			p[0].cloths = 1;
+			p[0].head = 4;
+			p[0].body = 0;
+			p[0].cloths = 4;
 
 			p[1] = new Player();
-			p[1].cName = "ubaduba";
-			p[1].uName = "Shadow";
-			p[1].head = 2;
-			p[1].body = 2;
-			p[1].cloths = 2;
+			p[1].cName = "sfsadfsafd";
+			p[1].uName = "Sombra";
+			p[1].head = 3;
+			p[1].body = 0;
+			p[1].cloths = 3;
 		}
 
 		public static Player GetPlayer()
@@ -260,6 +260,7 @@ namespace ServerEcho
 						Player aux = Globals.dicPlayers[i];
 						ByteBuffer buffer = new ByteBuffer();
 						buffer.WriteInt((int)Enums.AllEnums.SSendingAlreadyConnectedToMain);
+						buffer.WriteString(aux.uName);
 						buffer.WriteString(aux.cName);
 						buffer.WriteInt(aux.head);
 						buffer.WriteInt(aux.body);
@@ -280,6 +281,7 @@ namespace ServerEcho
 		{
 			ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteInt((int)Enums.AllEnums.SSendingMainToAlreadyConnected);
+			buffer.WriteString(p.uName);
 			buffer.WriteString(p.cName);
 			buffer.WriteInt(p.head);
 			buffer.WriteInt(p.body);

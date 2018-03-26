@@ -1,0 +1,9 @@
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\bin\Debug\TCPServer.exe.config
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\bin\Debug\TCPServer.exe
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\bin\Debug\TCPServer.pdb
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\obj\Debug\TCPServer.csproj.CoreCompileInputs.cache
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\obj\Debug\TCPServer.exe
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\obj\Debug\TCPServer.pdb
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\obj\Debug\TCPServer.csprojResolveAssemblyReference.cache
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\bin\Debug\ByteBufferDLL.dll
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\bin\Debug\ByteBufferDLL.pdb

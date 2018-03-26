@@ -136,12 +136,11 @@ public class Network : MonoBehaviour
 		int body = buffer.ReadInt();
 		int clothes = buffer.ReadInt();
 
-
 		Character NPC_Char = ScriptableObject.CreateInstance<Character>();
 		List<RuntimeAnimatorController> HairStyles;
 		List<RuntimeAnimatorController> ClothesStyles;
 		List<RuntimeAnimatorController> BodyStyle;
-		NPC_Char = ScriptableObject.CreateInstance<Character>();
+
 		HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
 		ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;
 		BodyStyle = FindObjectOfType<AssetList>().GetComponent<AssetList>().BodyStyle;
@@ -176,16 +175,21 @@ public class Network : MonoBehaviour
 		List<RuntimeAnimatorController> HairStyles;
 		List<RuntimeAnimatorController> ClothesStyles;
 		List<RuntimeAnimatorController> BodyStyle;
-		NPC_Char = ScriptableObject.CreateInstance<Character>();
 		HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
 		ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;
 		BodyStyle = FindObjectOfType<AssetList>().GetComponent<AssetList>().BodyStyle;
 
-		NPC_Char = ScriptableObject.CreateInstance<Character>();
 		NPC_Char.char_clothesAnimator = ClothesStyles[clothes];
 		NPC_Char.char_headAnimator = HairStyles[hair];
 		NPC_Char.char_bodyAnimator = BodyStyle[0];
-		NPC.GetComponent<CharacterRenderer>().character = NPC_Char;
+		try
+		{
+			NPC.GetComponent<CharacterRenderer>().character = NPC_Char;
+		}
+		catch (Exception e)
+		{
+			Console.Write(e.Message);
+		}
 		Instantiate(NPC, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
 
 		//otherPlayer.name = Convert.ToString(PlayerIndex);

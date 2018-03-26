@@ -44,6 +44,13 @@ namespace ByteBufferDLL
 			readpos = 0;
 		}
 		#region "Wrinting data"
+		/*public void WriteObjects(Object o, int length)
+		{
+			WriteInt(length);
+			buffer.AddRange(BitConverter.GetBytes(o));
+			BitConverter.GetBytes()
+		}*/
+
 		public void WriteByte(byte input)
 		{
 			buffer.Add(input);
@@ -105,34 +112,6 @@ namespace ByteBufferDLL
 				throw new Exception("Buffer is past its limit");
 			}
 		}
-
-		/*public int[] ReadInt2(bool peek = true, int size) // First 4 bytes will represent opcao, and the other 4 bytes playerID or something else
-		{
-			if (buffer.Count > readpos)
-			{
-				if (bufferUpdate)
-				{
-					readbuffer = buffer.ToArray();
-					bufferUpdate = false;
-				}
-
-				int[] ret = new int[size];
-				for (int i = 0; i < ret.Length; i++)
-				{
-					ret[i] = BitConverter.ToInt32(readbuffer,readpos + (4 * i));
-				}
-				ret[0] = BitConverter.ToInt32(readbuffer, readpos); // Reads 4 bytes from a given starting point and converts to int
-				ret[1] = BitConverter.ToInt32(readbuffer, readpos+4);
-
-				if (peek && buffer.Count > readpos)
-					readpos += (4*size);
-				return ret;
-			}
-			else
-			{
-				throw new Exception("Buffer is past its limit");
-			}
-		}*/
 
 		public String ReadString(bool peek = true)
 		{
