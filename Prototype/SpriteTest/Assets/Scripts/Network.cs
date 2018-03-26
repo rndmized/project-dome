@@ -16,6 +16,7 @@ public class Network : MonoBehaviour
 	//public string playerID = "";
 	public GameObject NPC;
 	public GameObject mainPlayer;
+	public GameObject spawnPoint;
 	//public GameObject npc;
 	//Dictonary<int,GameObject> npcs = new Dictonary<GameObject> ();
 
@@ -74,13 +75,13 @@ public class Network : MonoBehaviour
 		switch (packetNum)
 		{
 			case (int)Assets.Scripts.Enums.AllEnums.SSendingPlayerID:
-				HandleSSendingPlayerID(packetNum, data); //
+				HandlePlayerPackage(data, true); //
 				break;
 			case (int)Assets.Scripts.Enums.AllEnums.SSendingAlreadyConnectedToMain:
-				HandleSSendingAlreadyConnectedToMain(packetNum, data);
+				HandlePlayerPackage(data, false);
 				break;
 			case (int)Assets.Scripts.Enums.AllEnums.SSendingMainToAlreadyConnected:
-				HandleSSendingMainToAlreadyConnected(packetNum, data); //instantiating others to main player
+				HandlePlayerPackage(data, false); 
 				break;
 			case (int)Assets.Scripts.Enums.AllEnums.SSyncingPlayerMovement:
 				HandleSSyncingPlayerMovement(data);
@@ -88,111 +89,19 @@ public class Network : MonoBehaviour
 		}
 	}
 
-	void HandleSSendingPlayerID(int packetNum, byte[] data)
+	private void HandlePlayerPackage(byte[] data, bool isMainPlayer)
 	{
-		
-		//THIS IS WHERE THE MAIN IS HANDLED
-		//CURRENT FORM FOR TESTING ONLY
-		int packetnum;
 		ByteBuffer buffer = new ByteBuffer();
 		buffer.WriteBytes(data);
-		packetnum = buffer.ReadInt();
+		buffer.ReadInt();
 		String uName = buffer.ReadString();
 		String cName = buffer.ReadString();
 		int hair = buffer.ReadInt();
 		int body = buffer.ReadInt();
 		int clothes = buffer.ReadInt();
 
-		Character NPC_Char = ScriptableObject.CreateInstance<Character>();
-		List<RuntimeAnimatorController> HairStyles;
-		List<RuntimeAnimatorController> ClothesStyles;
-		List<RuntimeAnimatorController> BodyStyle;
-		NPC_Char = ScriptableObject.CreateInstance<Character>();
-		HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
-		ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;
-		BodyStyle = FindObjectOfType<AssetList>().GetComponent<AssetList>().BodyStyle;
+		InstantiatePlayer(uName,cName,clothes, hair, body, isMainPlayer);
 
-		NPC_Char = ScriptableObject.CreateInstance<Character>();
-		NPC_Char.char_name = cName;
-		NPC_Char.ID = uName;
-		NPC_Char.char_clothesAnimator = ClothesStyles[clothes];
-		NPC_Char.char_headAnimator = HairStyles[hair];
-		NPC_Char.char_bodyAnimator = BodyStyle[0];
-		mainPlayer.GetComponent<CharacterRenderer>().character = NPC_Char;
-		Instantiate(mainPlayer, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
-		
-	}
-
-	public void HandleSSendingAlreadyConnectedToMain(int packetNum, byte[] data)
-	{
-		//THIS IS WHERE THE MAIN IS HANDLED
-		//CURRENT FORM FOR TESTING ONLY
-		ByteBuffer buffer = new ByteBuffer();
-		buffer.WriteBytes(data);
-		packetNum = buffer.ReadInt();
-		String uName = buffer.ReadString();
-		String cName = buffer.ReadString();
-		int hair = buffer.ReadInt();
-		int body = buffer.ReadInt();
-		int clothes = buffer.ReadInt();
-
-		Character NPC_Char = ScriptableObject.CreateInstance<Character>();
-		List<RuntimeAnimatorController> HairStyles;
-		List<RuntimeAnimatorController> ClothesStyles;
-		List<RuntimeAnimatorController> BodyStyle;
-
-		HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
-		ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;
-		BodyStyle = FindObjectOfType<AssetList>().GetComponent<AssetList>().BodyStyle;
-
-		NPC_Char = ScriptableObject.CreateInstance<Character>();
-		NPC_Char.char_clothesAnimator = ClothesStyles[clothes];
-		NPC_Char.char_headAnimator = HairStyles[hair];
-		NPC_Char.char_bodyAnimator = BodyStyle[0];
-		NPC.GetComponent<CharacterRenderer>().character = NPC_Char;
-		Instantiate(NPC, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
-
-		//Instantiate(npc,spawnpoint, new Quaternium(0,0,0,0));
-		//npcs.add(PlayerIndex,npc);
-		/*playerID = PlayerIndex;
-		/*Globals g = Globals.getIstance();
-		g.MyIndex = PlayerIndex;*/
-	}
-
-	public void HandleSSendingMainToAlreadyConnected(int packetNum, byte[] data)
-	{
-		ByteBuffer buffer = new ByteBuffer();
-		buffer.WriteBytes(data);
-		packetNum = buffer.ReadInt();
-		String uName = buffer.ReadString();
-		String cName = buffer.ReadString();
-		int hair = buffer.ReadInt();
-		int body = buffer.ReadInt();
-		int clothes = buffer.ReadInt();
-
-
-		Character NPC_Char = ScriptableObject.CreateInstance<Character>();
-		List<RuntimeAnimatorController> HairStyles;
-		List<RuntimeAnimatorController> ClothesStyles;
-		List<RuntimeAnimatorController> BodyStyle;
-		HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
-		ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;
-		BodyStyle = FindObjectOfType<AssetList>().GetComponent<AssetList>().BodyStyle;
-
-		NPC_Char.char_clothesAnimator = ClothesStyles[clothes];
-		NPC_Char.char_headAnimator = HairStyles[hair];
-		NPC_Char.char_bodyAnimator = BodyStyle[0];
-		try
-		{
-			NPC.GetComponent<CharacterRenderer>().character = NPC_Char;
-		}
-		catch (Exception e)
-		{
-			Console.Write(e.Message);
-		}
-		Instantiate(NPC, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
-
-		//otherPlayer.name = Convert.ToString(PlayerIndex);
 	}
 
 	public void HandleSSyncingPlayerMovement(byte[] data)
@@ -226,7 +135,7 @@ public class Network : MonoBehaviour
 		myStream.Flush();
 	}
 
-	public void InstantiatePlayer(int clothe, int hair, int body)
+	public void InstantiatePlayer(string uName, string cName,int clothes, int hair, int body, bool isMainPlayer)
 	{
 		Character NPC_Char;
 		List<RuntimeAnimatorController> HairStyles;
@@ -238,13 +147,28 @@ public class Network : MonoBehaviour
 		ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;
 		BodyStyle = FindObjectOfType<AssetList>().GetComponent<AssetList>().BodyStyle;
 
+		NPC_Char.ID = uName;
+		NPC_Char.name = cName;
 		NPC_Char = ScriptableObject.CreateInstance<Character>();
-		NPC_Char.char_clothesAnimator = ClothesStyles[clothe];
+		NPC_Char.char_clothesAnimator = ClothesStyles[clothes];
 		NPC_Char.char_headAnimator = HairStyles[hair];
 		NPC_Char.char_bodyAnimator = BodyStyle[body];
 
-		NPC.GetComponent<CharacterRenderer>().character = NPC_Char;
-		Instantiate(NPC, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
+		switch (isMainPlayer)
+		{
+			case true:
+				{
+					mainPlayer.GetComponent<CharacterRenderer>().character = NPC_Char;
+					Instantiate(mainPlayer, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
+					break;
+				}
+			case false:
+				{
+					NPC.GetComponent<CharacterRenderer>().character = NPC_Char;
+					Instantiate(NPC, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
+					break;
+				}
+		}
 	}
 
 }

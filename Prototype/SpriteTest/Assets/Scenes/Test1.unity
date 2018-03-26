@@ -216,8 +216,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41726b8c5dd2fe149ab1d781d3410330, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NPC: {fileID: 258172562}
-  mainPlayer: {fileID: 1036091220}
+  NPC: {fileID: 1622232934060124, guid: 39534a212d85ac54e9eb570a5e6b4969, type: 2}
+  mainPlayer: {fileID: 1107773514949098, guid: 20486ae29ae836444a94baa053220475, type: 2}
 --- !u!4 &216149854
 Transform:
   m_ObjectHideFlags: 0
@@ -225,7 +225,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 216149852}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 410.45416, y: -18.266129, z: -13.625}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -246,7 +246,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &258172563
 Transform:
   m_ObjectHideFlags: 0
@@ -592,7 +592,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1036091221
 Transform:
   m_ObjectHideFlags: 0
