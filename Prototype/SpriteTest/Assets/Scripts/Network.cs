@@ -90,6 +90,7 @@ public class Network : MonoBehaviour
 
 	void HandleSSendingPlayerID(int packetNum, byte[] data)
 	{
+		
 		//THIS IS WHERE THE MAIN IS HANDLED
 		//CURRENT FORM FOR TESTING ONLY
 		int packetnum;
@@ -119,6 +120,7 @@ public class Network : MonoBehaviour
 		NPC_Char.char_bodyAnimator = BodyStyle[0];
 		mainPlayer.GetComponent<CharacterRenderer>().character = NPC_Char;
 		Instantiate(mainPlayer, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
+		
 	}
 
 	public void HandleSSendingAlreadyConnectedToMain(int packetNum, byte[] data)
@@ -161,11 +163,30 @@ public class Network : MonoBehaviour
 	public void HandleSSendingMainToAlreadyConnected(int packetNum, byte[] data)
 	{
 		ByteBuffer buffer = new ByteBuffer();
-
-
 		buffer.WriteBytes(data);
-		int PlayerIndex = buffer.ReadInt();
 		packetNum = buffer.ReadInt();
+		String uName = buffer.ReadString();
+		String cName = buffer.ReadString();
+		int hair = buffer.ReadInt();
+		int body = buffer.ReadInt();
+		int clothes = buffer.ReadInt();
+
+
+		Character NPC_Char = ScriptableObject.CreateInstance<Character>();
+		List<RuntimeAnimatorController> HairStyles;
+		List<RuntimeAnimatorController> ClothesStyles;
+		List<RuntimeAnimatorController> BodyStyle;
+		NPC_Char = ScriptableObject.CreateInstance<Character>();
+		HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
+		ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;
+		BodyStyle = FindObjectOfType<AssetList>().GetComponent<AssetList>().BodyStyle;
+
+		NPC_Char = ScriptableObject.CreateInstance<Character>();
+		NPC_Char.char_clothesAnimator = ClothesStyles[clothes];
+		NPC_Char.char_headAnimator = HairStyles[hair];
+		NPC_Char.char_bodyAnimator = BodyStyle[0];
+		NPC.GetComponent<CharacterRenderer>().character = NPC_Char;
+		Instantiate(NPC, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
 
 		//otherPlayer.name = Convert.ToString(PlayerIndex);
 	}
