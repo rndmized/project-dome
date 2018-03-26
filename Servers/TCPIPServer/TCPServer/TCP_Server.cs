@@ -13,11 +13,43 @@ namespace ServerEcho
 	{
 		public static TcpClient[] clients = new TcpClient[20];
 		public static Dictionary<int, Player> dicPlayers = new Dictionary<int, Player>();
+		public static int i = -1;
+		private static Player[] p = new Player[2];
+
+		public static void FeedDataToArray()
+		{
+			p[0] = new Player();
+			p[0].cName = "ubaduba";
+			p[0].uName = "Shadow";
+			p[0].head = 1;
+			p[0].body = 1;
+			p[0].cloths = 1;
+
+			p[1] = new Player();
+			p[1].cName = "ubaduba";
+			p[1].uName = "Shadow";
+			p[1].head = 2;
+			p[1].body = 2;
+			p[1].cloths = 2;
+		}
+
+		public static Player GetPlayer()
+		{
+			i++;
+			return p[i];
+		}
+
 	}
+
+	
 	class TCP_Server
 	{
 		static void Main(string[] args)
 		{
+			Globals.FeedDataToArray();
+			TCP_Server tcp = new TCP_Server();
+			tcp.start();
+			
 			/*TcpListener serverSocket = new TcpListener(IPAddress.Any,5500);
 			//TcpClient clientSocket = default(TcpClient);
 			int counter = 0;
@@ -47,7 +79,7 @@ namespace ServerEcho
 			Console.WriteLine(" >> " + "exit");
 			Console.ReadLine();*/
 
-			
+
 		}
 
 		public void start()
@@ -88,6 +120,7 @@ namespace ServerEcho
 		TcpClient clientSocket;
 		int clNo;
 		int count = 1;
+
 		public void startClient(TcpClient inClientSocket, int clineNo)
 		{
 			this.clientSocket = inClientSocket;
@@ -105,9 +138,10 @@ namespace ServerEcho
 			string rCount = null;
 			requestCount = 0;
 			NetworkStream networkStream = clientSocket.GetStream();
+			
 
 
-			while (!networkStream.DataAvailable) // waits for package with the auth key
+			/*while (!networkStream.DataAvailable) // waits for package with the auth key
 			{
 				ByteBuffer bbuffer = new ByteBuffer();
 
@@ -119,15 +153,24 @@ namespace ServerEcho
 				Player player = DB.GetPlayer(user);
 				Globals.dicPlayers.Add(clNo, player);
 				break;
-			} 
+			}*/
+
 
 			ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteInt((int)Enums.AllEnums.SSendingPlayerID);
-			buffer.WriteInt(clNo);
+			//buffer.WriteInt(clNo);
+
+			Player p = Globals.GetPlayer();
+			Globals.dicPlayers.Add(clNo, p);
+			buffer.WriteString(p.uName);
+			buffer.WriteString(p.cName);
+			buffer.WriteInt(p.head);
+			buffer.WriteInt(p.body);
+			buffer.WriteInt(p.cloths);
 			//networkStream = clientSocket.GetStream();
 			networkStream.Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 			//networkStream.Flush();
-			NotifyAlreadyConnected(clNo);
+			NotifyAlreadyConnected(clNo, p);
 			NotifyMainPlayerOfAlreadyConnected(clNo);
 
 			count++;
@@ -214,11 +257,17 @@ namespace ServerEcho
 					if (i != id)
 					{
 						Console.WriteLine(i);
+						Player aux = Globals.dicPlayers[i];
 						ByteBuffer buffer = new ByteBuffer();
 						buffer.WriteInt((int)Enums.AllEnums.SSendingAlreadyConnectedToMain);
-						buffer.WriteInt(i);
+						buffer.WriteString(aux.cName);
+						buffer.WriteInt(aux.head);
+						buffer.WriteInt(aux.body);
+						buffer.WriteInt(aux.cloths);
 						Thread.Sleep(100); //If the thread doesnt sleep, the packet is not sent
-						//Console.WriteLine(Globals.clients[id].GetStream().);
+										   //Console.WriteLine(Globals.clients[id].GetStream().);
+
+						
 						Globals.clients[id].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 						Globals.clients[id].GetStream().Flush();
 						Console.WriteLine("Sending sync to "+id);
@@ -227,11 +276,15 @@ namespace ServerEcho
 			}
 		}
 
-		static void NotifyAlreadyConnected(int id) // sends current player to already connected player 
+		static void NotifyAlreadyConnected(int id, Player p) // sends current player to already connected player 
 		{
 			ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteInt((int)Enums.AllEnums.SSendingMainToAlreadyConnected);
-			buffer.WriteInt(id);
+			buffer.WriteString(p.cName);
+			buffer.WriteInt(p.head);
+			buffer.WriteInt(p.body);
+			buffer.WriteInt(p.cloths);
+
 			for (int i = 0; i < 20; i++)
 			{
 				if (Globals.clients[i] != null && Globals.clients[i].Connected)
