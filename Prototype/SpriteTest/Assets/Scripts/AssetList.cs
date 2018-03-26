@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿
 using System.Collections.Generic;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -8,8 +8,8 @@ using UnityEngine;
 /// </summary>
 public class AssetList : MonoBehaviour {
 
-    public List<AnimatorController> BodyStyle = new List<AnimatorController>();
-    public List<AnimatorController> HairStyles = new List<AnimatorController>();
-    public List<AnimatorController> ClothesStyles = new List<AnimatorController>();
+    public List<RuntimeAnimatorController> BodyStyle = new List<RuntimeAnimatorController>();
+    public List<RuntimeAnimatorController> HairStyles = new List<RuntimeAnimatorController>();
+    public List<RuntimeAnimatorController> ClothesStyles = new List<RuntimeAnimatorController>();
 
 }

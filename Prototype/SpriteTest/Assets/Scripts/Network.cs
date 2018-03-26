@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Net.Sockets;
 using ByteBufferDLL;
 using System;
-using UnityEditor.Animations;
+//using UnityEditor.Animations;
 
 public class Network : MonoBehaviour
 {
@@ -103,9 +103,9 @@ public class Network : MonoBehaviour
 		int clothes = buffer.ReadInt();
 
 		Character NPC_Char = ScriptableObject.CreateInstance<Character>();
-		List<AnimatorController> HairStyles;
-		List<AnimatorController> ClothesStyles;
-		List<AnimatorController> BodyStyle;
+		List<RuntimeAnimatorController> HairStyles;
+		List<RuntimeAnimatorController> ClothesStyles;
+		List<RuntimeAnimatorController> BodyStyle;
 		NPC_Char = ScriptableObject.CreateInstance<Character>();
 		HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
 		ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;

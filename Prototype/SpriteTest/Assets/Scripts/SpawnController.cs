@@ -15,9 +15,9 @@ public class SpawnController : MonoBehaviour {
 
 
     Character NPC_Char;
-    List<AnimatorController> HairStyles;
-    List<AnimatorController> ClothesStyles;
-    List<AnimatorController> BodyStyle;
+    List<RuntimeAnimatorController> HairStyles;
+    List<RuntimeAnimatorController> ClothesStyles;
+    List<RuntimeAnimatorController> BodyStyle;
 
     // Use this for initialization
     void Start () {

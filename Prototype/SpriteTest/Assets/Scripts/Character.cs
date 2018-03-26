@@ -20,17 +20,17 @@ public class Character : ScriptableObject {
     /// <summary>
     /// Animation Controller for character's head.
     /// </summary>
-    public AnimatorController char_headAnimator;
+    public RuntimeAnimatorController char_headAnimator;
 
     /// <summary>
     /// Animation Controller for character's body.
     /// </summary>
-    public AnimatorController char_bodyAnimator;
+    public RuntimeAnimatorController char_bodyAnimator;
 
     /// <summary>
     /// Animation Controller for character's clothes.
     /// </summary>
-    public AnimatorController char_clothesAnimator;
+    public RuntimeAnimatorController char_clothesAnimator;
 
 
 
