@@ -35,7 +35,7 @@ public class LoginScript : MonoBehaviour {
         formFields.Add("username", usernameInputField.text);
         formFields.Add("password", passwordInputField.text);
         // Create http post request
-        UnityWebRequest http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress(), formFields);
+        UnityWebRequest http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress().ToString()+"/login", formFields);
 
         // Await for response
         yield return http.SendWebRequest();
@@ -52,7 +52,7 @@ public class LoginScript : MonoBehaviour {
             if (log.success == true)
             {
                 PlayerProfile.uID = usernameInputField.text;
-                SceneManager.LoadScene("Test1");
+                SceneManager.LoadScene("PlayerAccountScene");
             }
             
         }

@@ -93,24 +93,18 @@ public class CharacterCreationScript : MonoBehaviour {
 
     IEnumerator Upload()
     {
-        CharacterInfo charInfo = new CharacterInfo();
 
         // Create appropriate structure to send scores over the network
         Dictionary<string, string> formFields = new Dictionary<string, string>();
-        formFields.Add("userID", charInfo.uID);
-        formFields.Add("score", charInfo.score.ToString());
-        formFields.Add("characterName", charNameInputField.text);
-        charInfo.char_name = charNameInputField.text;
+        formFields.Add("username", "Test");
+        formFields.Add("char_name", charNameInputField.text);
         formFields.Add("char_hairId", hairStyle.ToString());
-        charInfo.hID = hairStyle;
         formFields.Add("char_clothesId", clothes.ToString());
-        charInfo.clothingID = clothes;
         formFields.Add("char_bodyId", body.ToString());
-        charInfo.bID = body;
 
-        JsonUtility.ToJson(charInfo);
+
         // Create http post request
-        UnityWebRequest http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress()+"/createCharacter", formFields);
+        UnityWebRequest http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress().ToString()+"/createCharacter", formFields);
 
         // Await for response
         yield return http.SendWebRequest();
@@ -121,12 +115,16 @@ public class CharacterCreationScript : MonoBehaviour {
         }
         else
         {
-            LoginInfo log = JsonUtility.FromJson<LoginInfo>(http.downloadHandler.text);
+            ServerAssertion log = JsonUtility.FromJson<ServerAssertion>(http.downloadHandler.text);
             Debug.Log(log.success);
 
             if (log.success == true)
             {
                 SceneManager.LoadScene("PlayerAccountScene");
+            }
+            else
+            {
+                Debug.Log(log.msg);
             }
 
         }

@@ -8,6 +8,7 @@ public static  class PlayerProfile {
     private static string gameServerAddress = "";
 
     public static string uID { get; set; }
+    public static string cID { get; set; }
 
     public static string GetLoginServerAddress()
     {

@@ -8,7 +8,7 @@ const Character = require('./models/Character');
 app.post('/login', function (req, res) {
   let password = req.body.password;
   let username = req.body.username;
-  if (username == "test" && password=="password"){
+  if (username == "Test" && password=="password"){
     res.status(201).json({ 'success': true});
   } else {
     return res.json({ "success": false, "msg": "Error while login" });
@@ -64,6 +64,34 @@ character.save(function (err) {
 
 
 
+app.post('/getCharacterList', function (req, res) {
+  let username = req.body.uID;
+  if (!username || username === "") {
+    return res.json({ "success": false, "msg": "You need to send the ID of the User" });
+  }
+  Character.find({userID:username}, function(err, characters) {
+
+    res.status(201).send(characters);  
+  });
+});
+
+
+app.post('/deleteCharacter', function (req, res) {
+  let username = req.body.uID;
+  let char_name = req.body.char_name;
+  if (!username || username === "") {
+    return res.json({ "success": false, "msg": "You need to send the ID of the User", "error": err });
+  }
+  if (!char_name || char_name === "") {
+    return res.json({ "success": false, "msg": "You need to send the ID/name of the Character", "error": err });
+  }
+  Character.findOneAndRemove({userID:username,char_name:char_name}, function (err, removed) {
+    if (err) {
+      return res.json({ "success": false, "msg": "Error while deleting Character", "error": err });
+    }
+    res.status(200).json({ "success": true, "msg": "Character deleted" });
+  });
+});
 
 
 /**
