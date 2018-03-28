@@ -16,6 +16,19 @@ app.post('/login', function (req, res) {
 });
 
 
+app.post('/loginAdmin', function (req, res) {
+  console.log("Login request received");
+  let password = req.body.password;
+  let username = req.body.username;
+  console.log(username +' '+password);
+  if (username == "Test" && password=="password"){
+    res.status(200).json({ success: true,token: 'fake-jwt-token' });
+  } else {
+    return res.status(200).json({success:false});
+  }
+});
+
+
 
 app.post('/register', function (req, res) {
   if (!req.body.username && !req.body.full_name && !req.body.email && !req.body.password) {

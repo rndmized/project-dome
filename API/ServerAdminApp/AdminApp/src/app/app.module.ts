@@ -4,6 +4,7 @@ import { ClarityModule } from "@clr/angular";
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { HttpModule } from '@angular/http';
 
 import { AppRouting } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -12,6 +13,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { AuthGuard } from './guards/auth.guard';
 import { AuthenticationService } from './services/authentication.service'
+import { AppSettingsService } from './services/app-settings.service'
 
 
 
@@ -27,11 +29,13 @@ import { AuthenticationService } from './services/authentication.service'
     FormsModule,
     HttpClientModule,
     CommonModule,
-    AppRouting
+    AppRouting,
+    HttpModule
   ],
   providers: [
     AuthGuard, 
-    AuthenticationService
+    AuthenticationService,
+    AppSettingsService
   ],
   bootstrap: [AppComponent]
 })
