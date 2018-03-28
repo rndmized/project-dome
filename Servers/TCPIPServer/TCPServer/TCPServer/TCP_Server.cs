@@ -8,6 +8,9 @@ using System.Net;
 using System.Collections.Generic;
 using MongoDB.Driver;
 using System.IO;
+using System.IdentityModel;
+using System.Security;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ServerEcho
 {
@@ -46,7 +49,7 @@ namespace ServerEcho
 	
 	class TCP_Server
 	{
-		static void Main(string[] args)
+		static void Maiaaan(string[] args)
 		{
 			Globals.FeedDataToArray();
 			TCP_Server tcp = new TCP_Server();
@@ -332,15 +335,17 @@ namespace ServerEcho
 
 		public static string Decypher(String text)
 		{
-			throw new Exception("To be implemented");
-		}
+			String tst;
+			try
+			{
+				tst = Jose.JWT.Decode(text, Encoding.ASCII.GetBytes(key));
+			}
+			catch(Exception e)
+			{
+				return null;
+			}
 
-		private static bool Autenthicate(String text)
-		{
-			byte[] auth = Convert.FromBase64String(text.Substring(text.LastIndexOf('.')));
-
-
-			return true;
+			return tst;
 		}
 
 		public static void LoadKey(string path)
