@@ -7,6 +7,7 @@ using EnumsServer;
 using System.Net;
 using System.Collections.Generic;
 using MongoDB.Driver;
+using System.IO;
 
 namespace ServerEcho
 {
@@ -325,8 +326,10 @@ namespace ServerEcho
 		{ }
 	}
 
-	public static class RSA
+	public static class JwtTokens
 	{
+		private static string key;
+
 		public static string Decypher(String text)
 		{
 			throw new Exception("To be implemented");
@@ -334,8 +337,19 @@ namespace ServerEcho
 
 		private static bool Autenthicate(String text)
 		{
-			throw new Exception("To be implemented");
+			byte[] auth = Convert.FromBase64String(text.Substring(text.LastIndexOf('.')));
+
+
+			return true;
 		}
+
+		public static void LoadKey(string path)
+		{
+			StreamReader reader = new StreamReader(path);
+			key = reader.ReadLine();
+			reader.Close();
+		}
+
 	}
 
 	public class DB //Singleton
@@ -356,14 +370,13 @@ namespace ServerEcho
 
 			return _db;
 		}
-		public Player GetPlayer(String id)
+		public Player GetPlayer(string uName,string cName)
 		{
 			var coll = mongodb.GetCollection<Player>(""); //collection's name in db
 
-			var p = coll.Find(pl => pl.uName == id);
+			var p = coll.Find(pl => pl.uName == uName && pl.cName==cName);
 
-
-			throw new Exception("To be implemented");
+			return (Player)p;
 		}
 	}
 }
