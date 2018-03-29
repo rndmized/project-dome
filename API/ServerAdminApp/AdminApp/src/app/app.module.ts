@@ -13,7 +13,11 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { AuthGuard } from './guards/auth.guard';
 import { AuthenticationService } from './services/authentication.service'
-import { AppSettingsService } from './services/app-settings.service'
+import { AppSettingsService } from './services/app-settings.service';
+import { LayoutComponent } from './layout/layout.component';
+import { HeaderComponent } from './layout/header/header.component';
+import { SidebarComponent } from './layout/sidebar/sidebar.component';
+import { MainComponent } from './layout/main/main.component'
 
 
 
@@ -21,7 +25,11 @@ import { AppSettingsService } from './services/app-settings.service'
   declarations: [
     AppComponent,
     LoginComponent,
-    DashboardComponent
+    DashboardComponent,
+    LayoutComponent,
+    HeaderComponent,
+    SidebarComponent,
+    MainComponent
   ],
   imports: [
     BrowserModule,
