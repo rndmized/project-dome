@@ -1,6 +1,7 @@
 const logger = require('morgan'),
   cors = require('cors'),
   http = require('http'),
+  jwt = require('jsonwebtoken'),
   express = require('express'),
   errorhandler = require('errorhandler'),
   bodyParser = require('body-parser'),

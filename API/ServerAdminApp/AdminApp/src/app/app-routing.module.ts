@@ -8,6 +8,7 @@ import { LayoutComponent } from './layout/layout.component';
 import { UsersComponent } from './users/users.component';
 import { InAppRootComponent } from './in-app-root/in-app-root.component';
 import { ServerSettingsComponent } from './server-settings/server-settings.component';
+import { PlayersComponent } from './players/players.component';
 
 
 const routes: Routes = [ 
@@ -20,6 +21,7 @@ const routes: Routes = [
         { path: 'dashboard', component: DashboardComponent },
         { path: 'users', component: UsersComponent },
         { path: 'settings', component: ServerSettingsComponent },
+        { path: 'players', component: PlayersComponent },
       ] }
     ], canActivate: [AuthGuard]
   },

@@ -105,6 +105,7 @@ public class CharacterCreationScript : MonoBehaviour {
 
         // Create http post request
         UnityWebRequest http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress().ToString()+"/createCharacter", formFields);
+        http.SetRequestHeader("Authorization", "Bearer " + PlayerProfile.token);
 
         // Await for response
         yield return http.SendWebRequest();

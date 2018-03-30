@@ -52,6 +52,8 @@ public class LoginScript : MonoBehaviour {
             if (log.success == true)
             {
                 PlayerProfile.uID = usernameInputField.text;
+                PlayerProfile.token = log.token;
+                Debug.Log(log.token);
                 SceneManager.LoadScene("PlayerAccountScene");
             }
             

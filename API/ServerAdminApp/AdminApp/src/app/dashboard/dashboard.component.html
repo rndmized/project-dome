@@ -2,22 +2,22 @@
   <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
     <div class="card">
       <div class="card-block">
-        <h3 class="card-title">Posts</h3>
-        <p class="card-text"></p>
+        <h3 class="card-title">Players Online</h3>
+        <p class="card-text">Concurrent players: </p>
       </div>
       <div class="card-footer">
-        <a [routerLink]="['/', 'posts']" class="btn btn-sm btn-link">Posts</a>
+        <a [routerLink]="['/','dash-menu', 'players']" class="btn btn-sm btn-link">Players Online</a>
       </div>
     </div>
   </div>
   <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
     <div class="card">
       <div class="card-block">
-        <h3 class="card-title">Todos</h3>
+        <h3 class="card-title">Server Settings</h3>
         <p class="card-text"></p>
       </div>
       <div class="card-footer">
-        <a [routerLink]="['/', 'todos']" class="btn btn-sm btn-link">Todos</a>
+        <a [routerLink]="['/', 'dash-menu', 'settings']" class="btn btn-sm btn-link">Settings</a>
       </div>
     </div>
   </div>
@@ -28,7 +28,42 @@
         <p class="card-text"></p>
       </div>
       <div class="card-footer">
-        <a [routerLink]="['/', 'users']" class="btn btn-sm btn-link">Users</a>
+        <a [routerLink]="['/', 'dash-menu', 'users']" class="btn btn-sm btn-link">Users</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+    <div class="card">
+      <div class="card-block">
+        <h3 class="card-title">Players Online</h3>
+        <p class="card-text">Concurrent players: </p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="['/','dash-menu', 'players']" class="btn btn-sm btn-link">Players Online</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+    <div class="card">
+      <div class="card-block">
+        <h3 class="card-title">Server Settings</h3>
+        <p class="card-text"></p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="['/', 'dash-menu', 'settings']" class="btn btn-sm btn-link">Settings</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+    <div class="card">
+      <div class="card-block">
+        <h3 class="card-title">Users</h3>
+        <p class="card-text"></p>
+      </div>
+      <div class="card-footer">
+        <a [routerLink]="['/', 'dash-menu', 'users']" class="btn btn-sm btn-link">Users</a>
       </div>
     </div>
   </div>

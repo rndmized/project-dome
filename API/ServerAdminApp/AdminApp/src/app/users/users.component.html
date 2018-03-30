@@ -1,6 +1,7 @@
 <table class="table">
   <thead>
     <tr>
+      <th class="left">Id </th>
       <th class="left">Name</th>
       <th class="left">Username</th>
       <th class="left">password</th>
@@ -11,12 +12,13 @@
   <tbody>
     <tr *ngFor="let user of users">
       <td class="left">
-        <a>{{user.full_name}}</a>
+        <a>{{user._id}}</a>
       </td>
+      <td class="left">{{user.full_name}}</td>
       <td class="left">{{user.username}}</td>
       <td class="left">{{user.password}}</td>
       <td class="left">{{user.email}}</td>
-      <td class="left"><button>Kick?</button></td>
+      <td class="left"><button class="btn btn-sm btn-danger-outline" title="Ban player from server">Ban?</button></td>
     </tr>
   </tbody>
 </table>

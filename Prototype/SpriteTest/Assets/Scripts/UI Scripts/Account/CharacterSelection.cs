@@ -57,8 +57,9 @@ public class CharacterSelection : MonoBehaviour {
 
         Dictionary<string, string> formFields = new Dictionary<string, string>();
         formFields.Add("uID", "Test");
-
-        UnityWebRequest http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress().ToString() + "/getCharacterList", formFields);
+        UnityWebRequest http = new UnityWebRequest();
+        http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress().ToString() + "/getCharacterList", formFields);
+        http.SetRequestHeader("Authorization", "Bearer " + PlayerProfile.token);
         Debug.Log("Sending request to server");
         // Await for response
         yield return http.SendWebRequest();
@@ -66,6 +67,7 @@ public class CharacterSelection : MonoBehaviour {
         if (http.isNetworkError || http.isHttpError)
         {
             Debug.Log(http.error);
+            Debug.Log(http.responseCode);
         }
         else
         {
@@ -95,8 +97,10 @@ public class CharacterSelection : MonoBehaviour {
         formFields.Add("uID", "Test");
         formFields.Add("char_name", char_name);
 
-
-        UnityWebRequest http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress().ToString() + "/deleteCharacter", formFields);
+        UnityWebRequest http = new UnityWebRequest();
+        
+        http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress().ToString() + "/deleteCharacter", formFields);
+        http.SetRequestHeader("Authorization", "Bearer " + PlayerProfile.token);
         Debug.Log("Sending request to server");
         // Await for response
         yield return http.SendWebRequest();

@@ -2,10 +2,17 @@
   <section class="sidenav-content">
     <a class="nav-link active" [routerLink]="['/dash-menu/dashboard']" >Dashboard</a>
     <section class="nav-group collapsible">
-      <input id="tabexample2" type="checkbox">
-      <label for="tabexample2">System</label>
+        <input id="CM" type="checkbox">
+        <label for="CM">Community Management</label>
+        <ul class="nav-list">
+          <li><a class="nav-link" [routerLink]="['/dash-menu/users']">Users</a></li>
+          <li><a class="nav-link" [routerLink]="['/dash-menu/players']">Players Online</a></li>
+        </ul>
+      </section>
+    <section class="nav-group collapsible">
+      <input id="Sys" type="checkbox">
+      <label for="Sys">System</label>
       <ul class="nav-list">
-        <li><a class="nav-link" [routerLink]="['/dash-menu/users']">Users</a></li>
         <li><a class="nav-link" [routerLink]="['/dash-menu/settings']">Settings</a></li>
       </ul>
     </section>

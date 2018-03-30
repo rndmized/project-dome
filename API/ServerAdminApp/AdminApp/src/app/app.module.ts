@@ -22,6 +22,7 @@ import { UsersComponent } from './users/users.component';
 import { InAppRootComponent } from './in-app-root/in-app-root.component';
 import { ServerSettingsComponent } from './server-settings/server-settings.component';
 import { DataService } from './services/data.service';
+import { PlayersComponent } from './players/players.component';
 
 
 
@@ -37,7 +38,8 @@ import { DataService } from './services/data.service';
     MainComponent,
     UsersComponent,
     InAppRootComponent,
-    ServerSettingsComponent
+    ServerSettingsComponent,
+    PlayersComponent
   ],
   imports: [
     BrowserModule,

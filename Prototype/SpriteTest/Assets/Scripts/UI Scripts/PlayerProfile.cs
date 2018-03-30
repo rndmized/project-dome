@@ -9,6 +9,7 @@ public static  class PlayerProfile {
 
     public static string uID { get; set; }
     public static string cID { get; set; }
+    public static string token { get; set; }
 
     public static string GetLoginServerAddress()
     {
