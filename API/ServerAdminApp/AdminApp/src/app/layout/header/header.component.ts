@@ -13,15 +13,14 @@ export class HeaderComponent implements OnInit {
   }
 
   headerLinks = [
-    { link: ['/', 'dashboard'], icon: 'home'},
-    { link: ['/', 'settings'], icon: 'cog'},
+    { link: ['/', 'dash-menu', 'dashboard'], icon: 'home'},
+    { link: ['/', 'dash-menu', 'settings'], icon: 'cog'},
   ];
 
   subLinks = [
     { link : ['/', 'dash-menu','dashboard'], label: 'Dashboard' },
-    { link : ['/', 'posts'], label: 'Posts' },
-    { link : ['/', 'todos'], label: 'Todos' },
     { link : ['/', 'dash-menu', 'users'], label: 'Users' },
+    { link : ['/', 'dash-menu', 'settings'], label: 'Settings' },
   ];
 
 }

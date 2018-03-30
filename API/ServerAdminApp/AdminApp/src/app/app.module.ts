@@ -20,6 +20,8 @@ import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { MainComponent } from './layout/main/main.component';
 import { UsersComponent } from './users/users.component';
 import { InAppRootComponent } from './in-app-root/in-app-root.component';
+import { ServerSettingsComponent } from './server-settings/server-settings.component';
+import { DataService } from './services/data.service';
 
 
 
@@ -34,7 +36,8 @@ import { InAppRootComponent } from './in-app-root/in-app-root.component';
     SidebarComponent,
     MainComponent,
     UsersComponent,
-    InAppRootComponent
+    InAppRootComponent,
+    ServerSettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -48,7 +51,8 @@ import { InAppRootComponent } from './in-app-root/in-app-root.component';
   providers: [
     AuthGuard, 
     AuthenticationService,
-    AppSettingsService
+    AppSettingsService,
+    DataService
   ],
   bootstrap: [AppComponent]
 })

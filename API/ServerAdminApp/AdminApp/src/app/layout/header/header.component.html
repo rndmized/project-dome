@@ -1,8 +1,8 @@
 <header class="header-1">
   <div class="branding">
     <a [routerLink]="['/']" class="nav-link">
-      <clr-icon shape="shield"></clr-icon>
-      <span class="title">Angular CLI</span>
+      <clr-icon shape="cloud"></clr-icon>
+      <span class="title">[Project-Dome] Server Management App</span>
     </a>
   </div>
   <div class="header-nav">
@@ -10,11 +10,6 @@
       <clr-icon [attr.shape]="headerLink.icon"></clr-icon>
     </a>
   </div>
-  <form class="search">
-    <label for="search_input">
-      <input id="search_input" type="text" placeholder="Search for keywords...">
-    </label>
-  </form>
   <div class="header-actions">
     <clr-dropdown class="dropdown bottom-right">
       <button class="nav-icon" clrDropdownToggle>
@@ -22,8 +17,6 @@
         <clr-icon shape="caret down"></clr-icon>
       </button>
       <div class="dropdown-menu">
-        <a clrDropdownItem>About</a>
-        <a clrDropdownItem>Preferences</a>
         <a clrDropdownItem [routerLink]="['/login']">Log out</a>
       </div>
     </clr-dropdown>

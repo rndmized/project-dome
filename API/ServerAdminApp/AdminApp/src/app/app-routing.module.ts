@@ -7,6 +7,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { LayoutComponent } from './layout/layout.component';
 import { UsersComponent } from './users/users.component';
 import { InAppRootComponent } from './in-app-root/in-app-root.component';
+import { ServerSettingsComponent } from './server-settings/server-settings.component';
 
 
 const routes: Routes = [ 
@@ -18,6 +19,7 @@ const routes: Routes = [
         { path: '', redirectTo: '/dashboard', pathMatch: 'full'  },
         { path: 'dashboard', component: DashboardComponent },
         { path: 'users', component: UsersComponent },
+        { path: 'settings', component: ServerSettingsComponent },
       ] }
     ], canActivate: [AuthGuard]
   },
