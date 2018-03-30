@@ -12,4 +12,16 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {
   }
 
+  headerLinks = [
+    { link: ['/', 'dashboard'], icon: 'home'},
+    { link: ['/', 'settings'], icon: 'cog'},
+  ];
+
+  subLinks = [
+    { link : ['/', 'dash-menu','dashboard'], label: 'Dashboard' },
+    { link : ['/', 'posts'], label: 'Posts' },
+    { link : ['/', 'todos'], label: 'Todos' },
+    { link : ['/', 'dash-menu', 'users'], label: 'Users' },
+  ];
+
 }

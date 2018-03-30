@@ -22,9 +22,9 @@ app.post('/loginAdmin', function (req, res) {
   let username = req.body.username;
   console.log(username +' '+password);
   if (username == "Test" && password=="password"){
-    res.status(200).json({ success: true,token: 'fake-jwt-token' });
+    res.status(200).json({ success: true, token: 'fake-jwt-token' });
   } else {
-    return res.status(200).json({success:false});
+    return res.status(200).json( {success: false} );
   }
 });
 

@@ -17,7 +17,10 @@ import { AppSettingsService } from './services/app-settings.service';
 import { LayoutComponent } from './layout/layout.component';
 import { HeaderComponent } from './layout/header/header.component';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
-import { MainComponent } from './layout/main/main.component'
+import { MainComponent } from './layout/main/main.component';
+import { UsersComponent } from './users/users.component';
+import { InAppRootComponent } from './in-app-root/in-app-root.component';
+
 
 
 
@@ -29,7 +32,9 @@ import { MainComponent } from './layout/main/main.component'
     LayoutComponent,
     HeaderComponent,
     SidebarComponent,
-    MainComponent
+    MainComponent,
+    UsersComponent,
+    InAppRootComponent
   ],
   imports: [
     BrowserModule,
