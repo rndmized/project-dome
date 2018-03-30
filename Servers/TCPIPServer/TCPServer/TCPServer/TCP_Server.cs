@@ -8,9 +8,6 @@ using System.Net;
 using System.Collections.Generic;
 using MongoDB.Driver;
 using System.IO;
-using System.IdentityModel;
-using System.Security;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace ServerEcho
 {
@@ -143,7 +140,7 @@ namespace ServerEcho
 			string rCount = null;
 			requestCount = 0;
 			NetworkStream networkStream = clientSocket.GetStream();
-			
+
 
 
 			/*while (!networkStream.DataAvailable) // waits for package with the auth key
@@ -153,9 +150,9 @@ namespace ServerEcho
 				networkStream.Read(bytesFrom, 0, 4096);
 				bbuffer.WriteBytes(bytesFrom);
 
-				String user = bbuffer.ReadString();
-				user = RSA.Decypher(user);
-				Player player = DB.GetPlayer(user);
+				String[] user = RSA.Decypher(bbuffer.ReadString());
+				//user = RSA.Decypher(user);
+				Player player = DB.GetPlayer(user[0],user[1]);
 				Globals.dicPlayers.Add(clNo, player);
 				break;
 			}*/
@@ -340,7 +337,7 @@ namespace ServerEcho
 			{
 				tst = Jose.JWT.Decode(text, Encoding.ASCII.GetBytes(key));
 			}
-			catch(Exception e)
+			catch(Exception)
 			{
 				return null;
 			}
