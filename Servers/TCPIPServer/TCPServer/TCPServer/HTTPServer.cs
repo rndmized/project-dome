@@ -1,12 +1,15 @@
-﻿using System;
+﻿using ByteBufferDLL;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TCPServer
@@ -23,16 +26,19 @@ namespace TCPServer
 	class HttpServer
 	{
 		private HttpListener httpListener;
-		private BlockingCollection<List<String>> inQueue; //
+		//private BlockingCollection<List<String>> inQueue; //
+		private TcpClient client = new TcpClient();
 		public HttpServer(int port)//, ref ArrayList job)
 		{
 			httpListener = new HttpListener();
 			httpListener.Prefixes.Add("http://localhost:" + port + "/");
 			//jobs = job;
+			client.Connect("ip", "port");
 		}
 
 		public void Run()
 		{
+
 			httpListener.Start();
 			Console.WriteLine(">> HTTP Server started ");
 			var context = httpListener.GetContext(); // The contexts(request) has a field rawUrl and httpMethod that encapsulates the url and method(post,get...)
@@ -98,12 +104,12 @@ namespace TCPServer
 			{
 				case "/broadcastMessage":
 					{
-						Stream body = response.Request.InputStream;
-						//body.
+						BroadcastMessage(response);
 						break;
 					}
 				case "/kickPlayer":
 					{
+						KickPlayer(response);
 						break;
 					}
 				default:
@@ -119,43 +125,96 @@ namespace TCPServer
 			}
 		}
 
-		private void BroadcastMessage(String msg)
+		/***********HAS TEMP STUFF**************/
+		private void BroadcastMessage(HttpListenerContext response)
 		{
-			//jobs.Add(msg);
+			var requestBody = response.Request.InputStream;
+			byte[] data = new byte[4096];
+			requestBody.Read(data, 0, (int)(response.Request.ContentLength64));
+			string msg = Encoding.UTF8.GetString(data);
+
+			ByteBuffer buffer = new ByteBuffer();
+
+			buffer.WriteInt(14); //TEMP
+			buffer.WriteString(msg);
+
+			Send(buffer.ToArray());
 		}
 
+		/***********HAS TEMP STUFF**************/
 		private void ListPlayers(HttpListenerContext response)
 		{
-			String json = "";
-			var buffer = Encoding.UTF8.GetBytes(json);
-			// Comunicate with server and get the list of players
+			byte[] data = new byte[4];
+			data = BitConverter.GetBytes(12); //TEMP
+
+			Send(data);
+
+			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
+
+			byte[] dataFromServer = new byte[client.Available]; 
+			client.GetStream().Read(dataFromServer, 0, dataFromServer.Length);
+
 			var output = response.Response.OutputStream;
-			output.Write(buffer, 0, buffer.Length);
+			output.Write(dataFromServer, 0, dataFromServer.Length); //if I create the json on server side, this is fine
 			output.Flush();
 			output.Close();
 		}
 
+		/***********HAS TEMP STUFF**************/
 		private void ServerUpTime(HttpListenerContext response)
 		{
+			byte[] data = new byte[4];
+			data = BitConverter.GetBytes(10); //TEMP
 
-			// Comunicate with server and get the server up time
+			Send(data);
 
-			String json = "";
-			var buffer = Encoding.UTF8.GetBytes(json);
+			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
 
-			var output = response.Response.OutputStream;
-			output.Write(buffer, 0, buffer.Length);
+			byte[] dataFromServer = new byte[client.Available];
+			client.GetStream().Read(dataFromServer, 0, dataFromServer.Length); 
+
+			//If I create the json on server side, I can just send the byte array direnctly to client
+
+			/*ByteBuffer buffer = new ByteBuffer();
+
+			buffer.WriteBytes(dataFromServer); */
+
+			var output = response.Response.OutputStream; 
+			output.Write(dataFromServer, 0, dataFromServer.Length); 
 			output.Flush();
 			output.Close();
 		}
 
+		/***********HAS TEMP STUFF**************/
 		private void KickPlayer(HttpListenerContext response)
 		{
-			var a = response.Request.InputStream;
+			var requestBody = response.Request.InputStream;
 			byte[] data = new byte[4096];
-			a.Read(data, 0, (int)(response.Request.ContentLength64));
+			requestBody.Read(data, 0, (int)(response.Request.ContentLength64));
 			string json = Encoding.UTF8.GetString(data);
-			//Deserialize json and send message to server
+
+			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteInt(11); //*******TEMP********* change the ID later
+			buffer.WriteString(json); //*******TEMP********* Deserialize json first
+
+			Send(buffer.ToArray());
+			//Send
+
+			/*while (!client.GetStream().DataAvailable) { }
+
+			byte[] dataA = new byte[client.Available];
+			client.GetStream().Read(dataA, 0, dataA.Length);
+
+			ByteBuffer buffer = new ByteBuffer();
+
+			buffer.WriteBytes(dataA);*/
+
+		}
+
+		private void Send(byte[] data)
+		{
+			client.GetStream().Write(data, 0, data.Length);
+			client.GetStream().Flush();
 		}
 	}
 }
