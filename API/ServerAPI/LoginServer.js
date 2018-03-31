@@ -27,6 +27,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect(config.database);
  
 app.use(require('./routes'));
+app.use(require('./GameClient/ClientRoutes'));
  
 http.createServer(app).listen(port, function (err) {
   console.log('listening in http://localhost:' + port);

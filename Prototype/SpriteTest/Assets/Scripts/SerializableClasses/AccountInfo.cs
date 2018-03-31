@@ -3,6 +3,7 @@
 public class AccountInfo
 {
     public bool success;
-    public string message;
+    public string msg;
+    public string code;
 
 }
