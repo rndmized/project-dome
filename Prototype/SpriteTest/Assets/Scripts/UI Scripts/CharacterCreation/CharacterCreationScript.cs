@@ -96,7 +96,7 @@ public class CharacterCreationScript : MonoBehaviour {
 
         // Create appropriate structure to send scores over the network
         Dictionary<string, string> formFields = new Dictionary<string, string>();
-        formFields.Add("username", "Test");
+        formFields.Add("username", PlayerProfile.uID);
         formFields.Add("char_name", charNameInputField.text);
         formFields.Add("char_hairId", hairStyle.ToString());
         formFields.Add("char_clothesId", clothes.ToString());
