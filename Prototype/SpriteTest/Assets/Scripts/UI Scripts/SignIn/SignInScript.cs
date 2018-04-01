@@ -7,19 +7,39 @@ using UnityEngine.UI;
 
 public class SignInScript : MonoBehaviour
 {
-
+    /// <summary>
+    /// Reference of Input Field.
+    /// </summary>
     private InputField usernameInputField;
+    /// <summary>
+    /// Reference of Input Field.
+    /// </summary>
     private InputField passwordInputField;
+    /// <summary>
+    /// Reference of Input Field.
+    /// </summary>
     private InputField passwordInputFieldValidation;
+    /// <summary>
+    /// Reference of Input Field.
+    /// </summary>
     private InputField fullnameInputField;
+    /// <summary>
+    /// Reference of Input Field.
+    /// </summary>
     private InputField emailInputField;
 
+    /// <summary>
+    /// Reference of Error Display Label.
+    /// </summary>
     private Text errorDisplay;
-    private bool errorMessage;
 
-    // Use this for initialization
+
+    /// <summary>
+    /// Initializer.
+    /// </summary>
     private void Start()
     {
+        /* Sets references to GameObjects. */
         usernameInputField = GameObject.Find("UsernameInputField").GetComponent<InputField>();
         passwordInputField = GameObject.Find("PasswordInputField").GetComponent<InputField>();
         passwordInputFieldValidation = GameObject.Find("PasswordInputFieldValidation").GetComponent<InputField>();
@@ -28,9 +48,12 @@ public class SignInScript : MonoBehaviour
 
         errorDisplay = GameObject.Find("ErrorDisplay").GetComponent<Text>();
         errorDisplay.text = "";
-        errorMessage = false;
+
     }
 
+    /// <summary>
+    /// Register New User.
+    /// </summary>
     public void register()
     {
         if (Validate())
@@ -39,6 +62,10 @@ public class SignInScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Low Level Validation Check.
+    /// </summary>
+    /// <returns>True if Input Fields have appropriate length, false otherwise.</returns>
     private bool Validate()
     {
         if (fullnameInputField.text.Length < 5 || fullnameInputField.text.Length > 16) { errorDisplay.text = "Full Name should be longer \n than 4 characters and shorter than 16!"; return false; }
@@ -49,65 +76,51 @@ public class SignInScript : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Return to previous menu.
+    /// </summary>
     public void ReturnToLogin()
     {
         SceneManager.LoadScene("LoginScene");
     }
 
-    private void FixedUpdate()
-    {
-
-    }
-
+    /// <summary>
+    /// Asyn IEnumerator Sends User Data to server for Account Creation.
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator Upload()
     {
-        // Create appropriate structure to send scores over the network
+        /*  Create Dictionary of strings to pass as arguments in the request body. */
         Dictionary<string, string> formFields = new Dictionary<string, string>();
         formFields.Add("username", usernameInputField.text);
         formFields.Add("password", passwordInputField.text);
         formFields.Add("email", emailInputField.text);
         formFields.Add("full_name", fullnameInputField.text);
-        // Create http post request
+        
+        /* Create http post request */
         UnityWebRequest www = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress() + "/register", formFields);
 
-        // Await for response
+        /* Await for response */
         yield return www.SendWebRequest();
-        // Log error, if no error return to main menu.
+        
         if (www.isNetworkError || www.isHttpError)
         {
+            /* Log error. */
             Debug.Log(www.error);
         }
         else
         {
+            /* Parse Server Response */
             AccountInfo log = JsonUtility.FromJson<AccountInfo>(www.downloadHandler.text);
-
+            /* On Success Return to Login Scene*/
             if (log.success == true)
             {
                 SceneManager.LoadScene("LoginScene");
             }
             else
             {
-
-                switch (log.code)
-                {
-                    case "MF":
-                        errorDisplay.text = log.msg;
-                        break;
-                    case "DU":
-                        //Display message: Duplicate username
-                        errorDisplay.text = log.msg;
-                        break;
-                    case "D@":
-                        //Display message: Duplicate email account
-                        errorDisplay.text = log.msg;
-                        break;
-                    case "UE":
-                        // Display message: Unexpected Error.
-                        errorDisplay.text = log.msg;
-                        break;
-                    default:
-                        break;
-                }
+                /* On Failure, display error message. */
+                errorDisplay.text = log.msg;
             }
 
         }

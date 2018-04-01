@@ -1,15 +1,17 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// CharacterData is a representation of a Character like it is stored in the database.
+/// </summary>
 [System.Serializable]
-[CreateAssetMenu(fileName = "New Character", menuName = "CharacterInfo")]
-public class CharacterInfo : ScriptableObject
+public class CharacterData
 {
     public string _id;
     public string userID;
     public string char_name;
-    public int char_hairId;
-    public int char_bodyId;
-    public int char_clothesId;
+    public string char_hairId;
+    public string char_bodyId;
+    public string char_clothesId;
     public int score;
     public int __v;
 
