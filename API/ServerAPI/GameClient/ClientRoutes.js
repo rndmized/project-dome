@@ -5,11 +5,11 @@ const app = module.exports = express.Router();
 
 /** Utils */
 const jwt = require('jsonwebtoken');
-const tokenValidator = require('../controllers/TokenValidator');
+const tokenValidator = require('../Utils/TokenValidator');
 
 /** Models */
-const User = require('../models/User');
-const Character = require('../models/Character');
+const User = require('../Models/User');
+const Character = require('../Models/Character');
 
 
 /** Move this to somewhere else, and create a proper key */
