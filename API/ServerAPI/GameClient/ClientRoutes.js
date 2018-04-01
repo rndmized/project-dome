@@ -168,7 +168,6 @@ app.post('/getCharacterList', tokenValidator, function (req, res) {
             Character.find({
                 userID: username
             }, function (err, characters) {
-
                 res.status(201).send(characters);
             });
         }

@@ -56,7 +56,7 @@ public class CharacterSelection : MonoBehaviour {
         characterInfos = new List<CharacterInfo>();
 
         Dictionary<string, string> formFields = new Dictionary<string, string>();
-        formFields.Add("uID", "Test");
+        formFields.Add("uID", PlayerProfile.uID);
         UnityWebRequest http = new UnityWebRequest();
         http = UnityWebRequest.Post(PlayerProfile.GetLoginServerAddress().ToString() + "/getCharacterList", formFields);
         http.SetRequestHeader("Authorization", "Bearer " + PlayerProfile.token);
@@ -94,7 +94,7 @@ public class CharacterSelection : MonoBehaviour {
     IEnumerator DeleteCharacter(string char_name)
     {
         Dictionary<string, string> formFields = new Dictionary<string, string>();
-        formFields.Add("uID", "Test");
+        formFields.Add("uID", PlayerProfile.uID);
         formFields.Add("char_name", char_name);
 
         UnityWebRequest http = new UnityWebRequest();
