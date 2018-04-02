@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// CharacterElementDisplay Script Renders Character based on CharacterInfo.
+/// </summary>
 public class CharacterElementDisplay : MonoBehaviour {
 
 
@@ -16,8 +16,10 @@ public class CharacterElementDisplay : MonoBehaviour {
 
     public CharacterInfo charInfo;
 
-
-
+    /// <summary>
+    /// Initializes this to CharacterInfo in this GameObject.
+    /// </summary>
+    /// <param name="charInfo">CharacterInfo values to Display.</param>
     public void init(CharacterInfo charInfo)
     {
         this.charInfo = charInfo;
@@ -32,7 +34,9 @@ public class CharacterElementDisplay : MonoBehaviour {
 
     }
 
-	// Use this for initialization
+	/// <summary>
+    /// Initializer.
+    /// </summary>
 	void Start () {
         if (charInfo != null)
         {

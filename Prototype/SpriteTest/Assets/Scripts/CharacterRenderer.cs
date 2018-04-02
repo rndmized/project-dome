@@ -15,15 +15,18 @@ public class CharacterRenderer : MonoBehaviour {
     /// <summary>
     /// Player Reference.
     /// </summary>
-    Transform player;
+    private Transform player;
 
     /// <summary>
-    /// On start set Reference to GameObject. Find child Object "GFX" and set children values to Character's object attached values.
+    /// On start set Reference to GameObject. Find child Object "GFX" and set children values to Character's object attached values. -> On init().
     /// </summary>
-    void Start () {
+    private void Start () {
         init();
     }
 
+    /// <summary>
+    /// Initializer
+    /// </summary>
     private void init()
     {
         player = GetComponent<Transform>();
@@ -33,7 +36,10 @@ public class CharacterRenderer : MonoBehaviour {
 
     }
 
-    void FixedUpdate()
+    /// <summary>
+    /// Update Unnotified Player Changes.
+    /// </summary>
+    private void FixedUpdate()
     {
         init();
     }

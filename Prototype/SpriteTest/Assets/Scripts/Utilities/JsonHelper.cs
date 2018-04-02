@@ -1,6 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
+/*ref: https://stackoverflow.com/questions/36239705/serialize-and-deserialize-json-and-json-array-in-unity/36244111#36244111 */
+/// <summary>
+/// Helper Class to fix JsonUtility Flaws.
+/// </summary>
 public static class JsonHelper
 {
     public static T[] FromJson<T>(string json)

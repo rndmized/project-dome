@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Test Class to store animation resources (Temporary until assets can be loaded properly)
+/// Class to store animation resources (Temporary until assets can be loaded properly)
 /// </summary>
 public class UIAssetList : MonoBehaviour {
 

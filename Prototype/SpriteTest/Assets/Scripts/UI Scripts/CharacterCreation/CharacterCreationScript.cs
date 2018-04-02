@@ -5,42 +5,83 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// Script that controls Character Creation Process.
+/// </summary>
 public class CharacterCreationScript : MonoBehaviour {
 
+    /// <summary>
+    /// Reference to Character's Transform.
+    /// </summary>
     public Transform player;
 
-    Character character;
-    CharacterRenderer char_renderer;
-    List<RuntimeAnimatorController> HairStyles;
-    List<RuntimeAnimatorController> ClothesStyles;
-    List<RuntimeAnimatorController> BodyStyle;
+    /// <summary>
+    /// Private Instance of a Chraracter.
+    /// </summary>
+    private Character character;
+    /// <summary>
+    /// Reference to the Character Renderer Component of the Character.
+    /// </summary>
+    private CharacterRenderer char_renderer;
+    /// <summary>
+    /// Reference to list of Hair Animations.
+    /// </summary>
+    private List<RuntimeAnimatorController> HairStyles;
+    /// <summary>
+    /// reference to list of Clothes Animations.
+    /// </summary>
+    private List<RuntimeAnimatorController> ClothesStyles;
+    /// <summary>
+    /// Reference to list of Body Animations.
+    /// </summary>
+    private List<RuntimeAnimatorController> BodyStyle;
 
+    /// <summary>
+    /// Reference to Fielf Input for character's name.
+    /// </summary>
     private InputField charNameInputField;
 
-    int clothes;
-    int hairStyle;
-    int body;
+    /// <summary>
+    /// Index of clothes.
+    /// </summary>
+    private int clothes;
+    /// <summary>
+    /// Index of hair styles.
+    /// </summary>
+    private int hairStyle;
+    /// <summary>
+    /// Index of body type.
+    /// </summary>
+    private int body;
     
-    // Use this for initialization
+    /// <summary>
+    /// Initializer.
+    /// </summary>
     void Start () {
 
+        /* Initialize references to its default values. */
 
         character = ScriptableObject.CreateInstance<Character>();
+
         HairStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().HairStyles;
         ClothesStyles = FindObjectOfType<AssetList>().GetComponent<AssetList>().ClothesStyles;
         BodyStyle = FindObjectOfType<AssetList>().GetComponent<AssetList>().BodyStyle;
+
         character.char_clothesAnimator = ClothesStyles[clothes];
         character.char_headAnimator = HairStyles[hairStyle];
         character.char_bodyAnimator = BodyStyle[0];
+
         player.GetComponent<CharacterRenderer>().character = character;
-
-
         charNameInputField = GameObject.Find("CharacterNameInputField").GetComponent<InputField>();
 
         
 
     }
 
+    /// <summary>
+    /// Hair Style Rotation function.
+    /// </summary>
+    /// <param name="next">Can be either next or previous</param>
     public void NextHairStyle(string next)
     {
         switch (next)
@@ -59,7 +100,10 @@ public class CharacterCreationScript : MonoBehaviour {
 
     }
 
-
+    /// <summary>
+    /// Clothing Rotation Function.
+    /// </summary>
+    /// <param name="next">Can be either next or previous</param>
     public void NextClothing(string next)
     {
         switch (next)
@@ -78,25 +122,32 @@ public class CharacterCreationScript : MonoBehaviour {
 
     }
 
-
+    /// <summary>
+    /// Calls Async IEnumerator to upload Character to server to store it in the player's account.
+    /// </summary>
     public void CreateCharacter()
     {
         StartCoroutine(Upload());
     }
 
-
+    /// <summary>
+    /// Return to Player's Account Menu.
+    /// </summary>
     public void ReturnToAccount()
     {
         SceneManager.LoadScene("PlayerAccountScene");
     }
 
-
-    IEnumerator Upload()
+    /// <summary>
+    /// Upload new Character data to Server.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator Upload()
     {
 
-        // Create appropriate structure to send scores over the network
+        /*  Create Dictionary of strings to pass as arguments in the request body. */
         Dictionary<string, string> formFields = new Dictionary<string, string>();
-        formFields.Add("username", "Test");
+        formFields.Add("username", PlayerProfile.uID);
         formFields.Add("char_name", charNameInputField.text);
         formFields.Add("char_hairId", hairStyle.ToString());
         formFields.Add("char_clothesId", clothes.ToString());
@@ -109,22 +160,26 @@ public class CharacterCreationScript : MonoBehaviour {
 
         // Await for response
         yield return http.SendWebRequest();
-        // Log error, if no error return to main menu.
+        
         if (http.isNetworkError || http.isHttpError)
         {
+            /* Log error. */
             Debug.Log(http.error);
         }
         else
         {
+        
+            /* Parse Server response. */
             ServerAssertion log = JsonUtility.FromJson<ServerAssertion>(http.downloadHandler.text);
-            Debug.Log(log.success);
 
+            /* If Server response is successfull return to previous menu. */
             if (log.success == true)
             {
                 SceneManager.LoadScene("PlayerAccountScene");
             }
             else
             {
+                /* TODO: Notify player. */
                 Debug.Log(log.msg);
             }
 
