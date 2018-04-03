@@ -163,6 +163,7 @@ namespace ServerEcho
 
 			//IF YOU WANT TO TEST WITH THE TEST SCENE, USE THIS CODE
 			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteInt(0);
 			buffer.WriteInt((int)Enums.AllEnums.SSendingPlayerID);
 			//buffer.WriteInt(clNo);
 
@@ -173,11 +174,20 @@ namespace ServerEcho
 			buffer.WriteInt(pl.head);
 			buffer.WriteInt(pl.body);
 			buffer.WriteInt(pl.cloths);
+
+			byte[] size = BitConverter.GetBytes(buffer.Size());
+			byte[] aux = buffer.ToArray();
+
+			aux[0] = size[0];
+			aux[1] = size[1];
+			aux[2] = size[2];
+			aux[3] = size[3];
+
+			/*Console.WriteLine(buffer.Size());
+			Console.WriteLine(buffer.ToArray().Length);*/
 			//networkStream = clientSocket.GetStream();
-			networkStream.Write(buffer.ToArray(), 0, buffer.ToArray().Length);
+			Globals.clients[i].GetStream().Write(aux, 0, aux.Length);
 			networkStream.Flush();
-
-
 
 			NotifyAlreadyConnected(clNo, pl);
 			NotifyMainPlayerOfAlreadyConnected(clNo);
@@ -197,6 +207,7 @@ namespace ServerEcho
 						networkStream.Read(bytesFrom, 0, 4096);
 						buffer.WriteBytes(bytesFrom);
 
+						buffer.ReadInt(); // ignoring package size
 						int packageID = buffer.ReadInt();
 
 						if (packageID == (int)Enums.AllEnums.SCloseConnection)
@@ -207,6 +218,8 @@ namespace ServerEcho
 						HandleMessage(packageID, clNo,buffer.ToArray()); 
 						
 					}
+
+					//Thread.Sleep(50);
 
 				}
 				catch (Exception ex)
@@ -242,19 +255,28 @@ namespace ServerEcho
 					if (i != id)
 					{
 						Console.WriteLine(i);
-						Player aux = Globals.dicPlayers[i];
 						ByteBuffer buffer = new ByteBuffer();
+						buffer.WriteInt(0);
 						buffer.WriteInt((int)Enums.AllEnums.SSendingAlreadyConnectedToMain);
-						buffer.WriteString(aux.uName);
-						buffer.WriteString(aux.cName);
-						buffer.WriteInt(aux.head);
-						buffer.WriteInt(aux.body);
-						buffer.WriteInt(aux.cloths);
-						Thread.Sleep(100); //If the thread doesnt sleep, the packet is not sent
+						buffer.WriteString(Globals.dicPlayers[i].uName);
+						buffer.WriteString(Globals.dicPlayers[i].cName);
+						buffer.WriteInt(Globals.dicPlayers[i].head);
+						buffer.WriteInt(Globals.dicPlayers[i].body);
+						buffer.WriteInt(Globals.dicPlayers[i].cloths);
+
+						byte[] size = BitConverter.GetBytes(buffer.Size());
+						byte[] aux = buffer.ToArray();
+
+						aux[0] = size[0];
+						aux[1] = size[1];
+						aux[2] = size[2];
+						aux[3] = size[3];
+
+						Thread.Sleep(150); //If the thread doesnt sleep, the packet is not sent
 										   //Console.WriteLine(Globals.clients[id].GetStream().);
 
-						
-						Globals.clients[id].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
+
+						Globals.clients[i].GetStream().Write(aux, 0, aux.Length);
 						Globals.clients[id].GetStream().Flush();
 						Console.WriteLine("Sending sync to "+id);
 					}
@@ -265,6 +287,8 @@ namespace ServerEcho
 		static void NotifyAlreadyConnected(int id, Player p) // sends current player to already connected player 
 		{
 			ByteBuffer buffer = new ByteBuffer();
+
+			buffer.WriteInt(0);
 			buffer.WriteInt((int)Enums.AllEnums.SSendingMainToAlreadyConnected);
 			buffer.WriteString(p.uName);
 			buffer.WriteString(p.cName);
@@ -272,13 +296,21 @@ namespace ServerEcho
 			buffer.WriteInt(p.body);
 			buffer.WriteInt(p.cloths);
 
+			byte[] size = BitConverter.GetBytes(buffer.Size());
+			byte[] aux = buffer.ToArray();
+
+			aux[0] = size[0];
+			aux[1] = size[1];
+			aux[2] = size[2];
+			aux[3] = size[3];
+
 			for (int i = 0; i < 20; i++)
 			{
 				if (Globals.clients[i] != null && Globals.clients[i].Connected)
 				{
 					if (i != id)
 					{
-						Globals.clients[i].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
+						Globals.clients[i].GetStream().Write(aux, 0, aux.Length);
 						Globals.clients[i].GetStream().Flush();
 					}
 				}
@@ -287,8 +319,8 @@ namespace ServerEcho
 
 		static void SendToAllBut(int id, byte[] data)
 		{
-			ByteBuffer buffer = new ByteBuffer();
-			buffer.WriteBytes(data);
+			/*ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteBytes(data);*/
 			
 			for (int i = 0; i < 20; i++)
 			{
@@ -297,7 +329,7 @@ namespace ServerEcho
 					if (i != id)
 					{
 						Console.WriteLine("Sending move from "+id+" to " + i);
-						Globals.clients[i].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
+						Globals.clients[i].GetStream().Write(data, 0, data.Length);
 						Globals.clients[i].GetStream().Flush();
 					}
 				}
