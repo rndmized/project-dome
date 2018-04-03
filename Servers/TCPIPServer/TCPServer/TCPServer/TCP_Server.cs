@@ -57,6 +57,8 @@ namespace ServerEcho
 		public TCP_Server(string path)
 		{
 			//load config file
+			//StreamReader reader = new StreamReader(path);
+			//string port = reader.ReadLine();
 			serverSocket  = new TcpListener(IPAddress.Any, 5500);
 		}
 
@@ -139,7 +141,7 @@ namespace ServerEcho
 			NetworkStream networkStream = clientSocket.GetStream();
 
 			
-			//while (!networkStream.DataAvailable) {Thread.Sleep(50);}// waits for package with the auth key
+			/*while (!networkStream.DataAvailable) {Thread.Sleep(50);}// waits for package with the auth key
 			
 			ByteBuffer buffer = new ByteBuffer();
 
@@ -155,16 +157,16 @@ namespace ServerEcho
 			pl.cloths = buffer.ReadInt();
 			pl.socketID = clNo;
 			
-			Globals.dicPlayers.Add(clNo, pl);
+			Globals.dicPlayers.Add(clNo, pl);*/
 
 			
 
 			//IF YOU WANT TO TEST WITH THE TEST SCENE, USE THIS CODE
-			/*ByteBuffer buffer = new ByteBuffer();
+			ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteInt((int)Enums.AllEnums.SSendingPlayerID);
 			//buffer.WriteInt(clNo);
 
-			//Player pl = Globals.GetPlayer();
+			Player pl = Globals.GetPlayer();
 			Globals.dicPlayers.Add(clNo, pl); 
 			buffer.WriteString(pl.uName);
 			buffer.WriteString(pl.cName);
@@ -173,7 +175,7 @@ namespace ServerEcho
 			buffer.WriteInt(pl.cloths);
 			//networkStream = clientSocket.GetStream();
 			networkStream.Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-			//networkStream.Flush();*/
+			networkStream.Flush();
 
 
 
@@ -185,7 +187,7 @@ namespace ServerEcho
 			{
 				try
 				{
-					requestCount = requestCount + 1;
+					requestCount++;
 					networkStream = clientSocket.GetStream();
 
 					if (networkStream.DataAvailable)
@@ -202,7 +204,7 @@ namespace ServerEcho
 							run = false;
 						}
 
-						HandleMessage(packageID, clNo,buffer.ToArray()); //Maybe use ref instead of sending a byte array to save memory and a bit of performance
+						HandleMessage(packageID, clNo,buffer.ToArray()); 
 						
 					}
 
