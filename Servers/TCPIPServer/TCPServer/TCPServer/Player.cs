@@ -17,5 +17,7 @@ namespace ServerEcho
 		public int head { get; set; }
 		public int body { get; set; }
 		public int cloths { get; set; }
+
+		public int socketID { get; set; }
 	}
 }

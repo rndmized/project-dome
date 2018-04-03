@@ -11,9 +11,10 @@ using System.IO;
 
 namespace ServerEcho
 {
-	class Globals
+	class Globals //Class used to share data between threades
 	{
 		public static TcpClient[] clients = new TcpClient[20];
+		public static Dictionary<string, Player> dicPlayers1 = new Dictionary<string, Player>();
 		public static Dictionary<int, Player> dicPlayers = new Dictionary<int, Player>();
 		public static int i = -1;
 		private static Player[] p = new Player[2];
@@ -22,14 +23,14 @@ namespace ServerEcho
 		{
 			p[0] = new Player();
 			p[0].cName = "ubaduba";
-			p[0].uName = "Shadow";
+			p[0].uName = "Player1";
 			p[0].head = 4;
 			p[0].body = 0;
 			p[0].cloths = 4;
 
 			p[1] = new Player();
 			p[1].cName = "sfsadfsafd";
-			p[1].uName = "Sombra";
+			p[1].uName = "Player2";
 			p[1].head = 3;
 			p[1].body = 0;
 			p[1].cloths = 3;
@@ -43,66 +44,47 @@ namespace ServerEcho
 
 	}
 
-	
+	/// <summary>
+	/// The class that starts the server
+	/// Contains method to load the server config and start the server.
+	/// </summary>
 	class TCP_Server
 	{
-		static void Maiaaan(string[] args)
+		private bool run = true;
+		TcpListener serverSocket;
+		int counter = 0;
+
+		public TCP_Server(string path)
 		{
-			Globals.FeedDataToArray();
-			TCP_Server tcp = new TCP_Server();
-			tcp.start();
-			
-			/*TcpListener serverSocket = new TcpListener(IPAddress.Any,5500);
-			//TcpClient clientSocket = default(TcpClient);
-			int counter = 0;
-
-			serverSocket.Start();
-			Console.WriteLine(" >> " + "TCP IP Server Started");
-
-			while (true)
-			{
-				for (int i = 0; i < 20; i++)
-				{
-					if (Globals.clients[i] == null)
-					{
-						Globals.clients[i] = new TcpClient();
-						Globals.clients[i] = serverSocket.AcceptTcpClient();
-						Console.WriteLine(" >> " + "Client No:" + Convert.ToString(counter) + " started! " + Globals.clients[i].Client.LocalEndPoint);
-						handleClinet client = new handleClinet();
-						client.startClient(Globals.clients[i], counter);
-						counter++;
-					}
-				}
-
-			}
-
-			//clientSocket.Close();
-			serverSocket.Stop();
-			Console.WriteLine(" >> " + "exit");
-			Console.ReadLine();*/
-
-
+			//load config file
+			serverSocket  = new TcpListener(IPAddress.Any, 5500);
 		}
 
-		public void start()
+		static void Main(string[] args)
 		{
-			TcpListener serverSocket = new TcpListener(IPAddress.Any, 5500);
-			//TcpClient clientSocket = default(TcpClient);
+			Globals.FeedDataToArray();
+			TCP_Server tcp = new TCP_Server("");
+			tcp.Start();
+			
+		}
+
+		public void Start()
+		{
 			int counter = 0;
-
+			JwtTokens.LoadKey("");
 			serverSocket.Start();
-			Console.WriteLine(" >> " + "TCP IP Server Started");
+			Console.WriteLine(" >> TCP IP Server Started");
 
-			while (true)
+			while (run)
 			{
-				for (int i = 0; i < 20; i++)
+				for (int i = 0; i < Globals.clients.Length; i++)
 				{
 					if (Globals.clients[i] == null)
 					{
 						Globals.clients[i] = new TcpClient();
 						Globals.clients[i] = serverSocket.AcceptTcpClient();
 						Console.WriteLine(" >> " + "Client No:" + Convert.ToString(counter) + " started! " + Globals.clients[i].Client.LocalEndPoint);
-						handleClinet client = new handleClinet();
+						HandleClinet client = new HandleClinet();
 						client.startClient(Globals.clients[i], counter);
 						counter++;
 					}
@@ -115,13 +97,31 @@ namespace ServerEcho
 			Console.WriteLine(" >> " + "exit");
 			Console.ReadLine();
 		}
+
+		public void CloseSocket()
+		{
+			for (int i = 0; i < Globals.clients.Length; i++)
+			{
+				if (Globals.clients[i] != null)
+				{
+					//update db
+					Globals.clients[i].Close();
+				}
+			}
+			serverSocket.Stop();
+		}
 	}
 
-	public class handleClinet
+	/// <summary>
+	/// The class that handles the incoming connections from clients
+	/// Contains all methods to handle received data packets and send packets to clients
+	/// </summary>
+	public class HandleClinet
 	{
-		TcpClient clientSocket;
-		int clNo;
-		int count = 1;
+		private TcpClient clientSocket;
+		private int clNo;
+		private int count = 1;
+		
 
 		public void startClient(TcpClient inClientSocket, int clineNo)
 		{
@@ -130,53 +130,58 @@ namespace ServerEcho
 			Thread ctThread = new Thread(doClient);
 			ctThread.Start();
 		}
-		private void doClient()
+		private void doClient() 
 		{
 			int requestCount = 0;
 			byte[] bytesFrom = new byte[10025];
-			string dataFromClient = null;
-			Byte[] sendBytes = null;
-			string serverResponse = null;
-			string rCount = null;
+			bool run = true;
 			requestCount = 0;
 			NetworkStream networkStream = clientSocket.GetStream();
 
-
-
-			/*while (!networkStream.DataAvailable) // waits for package with the auth key
-			{
-				ByteBuffer bbuffer = new ByteBuffer();
-
-				networkStream.Read(bytesFrom, 0, 4096);
-				bbuffer.WriteBytes(bytesFrom);
-
-				String[] user = RSA.Decypher(bbuffer.ReadString());
-				//user = RSA.Decypher(user);
-				Player player = DB.GetPlayer(user[0],user[1]);
-				Globals.dicPlayers.Add(clNo, player);
-				break;
-			}*/
-
-
+			
+			//while (!networkStream.DataAvailable) {Thread.Sleep(50);}// waits for package with the auth key
+			
 			ByteBuffer buffer = new ByteBuffer();
+
+			networkStream.Read(bytesFrom, 0, 4096);
+			buffer.WriteBytes(bytesFrom);
+
+			JwtTokens.EvaluateToken(buffer.ReadString());
+			Player pl = new Player();
+			pl.uName = buffer.ReadString();
+			pl.cName = buffer.ReadString();
+			pl.head = buffer.ReadInt();
+			pl.body = buffer.ReadInt();
+			pl.cloths = buffer.ReadInt();
+			pl.socketID = clNo;
+			
+			Globals.dicPlayers.Add(clNo, pl);
+
+			
+
+			//IF YOU WANT TO TEST WITH THE TEST SCENE, USE THIS CODE
+			/*ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteInt((int)Enums.AllEnums.SSendingPlayerID);
 			//buffer.WriteInt(clNo);
 
-			Player p = Globals.GetPlayer();
-			Globals.dicPlayers.Add(clNo, p);
-			buffer.WriteString(p.uName);
-			buffer.WriteString(p.cName);
-			buffer.WriteInt(p.head);
-			buffer.WriteInt(p.body);
-			buffer.WriteInt(p.cloths);
+			//Player pl = Globals.GetPlayer();
+			Globals.dicPlayers.Add(clNo, pl); 
+			buffer.WriteString(pl.uName);
+			buffer.WriteString(pl.cName);
+			buffer.WriteInt(pl.head);
+			buffer.WriteInt(pl.body);
+			buffer.WriteInt(pl.cloths);
 			//networkStream = clientSocket.GetStream();
 			networkStream.Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-			//networkStream.Flush();
-			NotifyAlreadyConnected(clNo, p);
+			//networkStream.Flush();*/
+
+
+
+			NotifyAlreadyConnected(clNo, pl);
 			NotifyMainPlayerOfAlreadyConnected(clNo);
 
 			count++;
-			while ((true))
+			while (run)
 			{
 				try
 				{
@@ -191,33 +196,16 @@ namespace ServerEcho
 						buffer.WriteBytes(bytesFrom);
 
 						int packageID = buffer.ReadInt();
-						if (packageID == 4)
+
+						if (packageID == (int)Enums.AllEnums.SCloseConnection)
 						{
-							Console.WriteLine("Movement apckage received");
-							Console.WriteLine(buffer.ToString());
+							run = false;
 						}
-						HandleMessage(packageID, buffer.ReadInt(),buffer.ToArray()); //Maybe use ref instead of sending a byte array to save memory and a bit of performance
+
+						HandleMessage(packageID, clNo,buffer.ToArray()); //Maybe use ref instead of sending a byte array to save memory and a bit of performance
 						
-						/*string msg = "";
-						//int id = buffer.ReadInt();
-						//string msg = id + " : ";
-						/*msg += buffer.ReadString();
-						buffer = new ByteBuffer();
-						//dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
-						//dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
-						Console.WriteLine(" >> " + "From client-" + clNo + msg);
-						buffer.WriteString(msg);
-						networkStream.Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-						networkStream.Flush();*/
 					}
 
-
-					/*rCount = Convert.ToString(requestCount);
-					serverResponse = "Server to clinet(" + clNo + ") " + rCount;
-					sendBytes = Encoding.ASCII.GetBytes(serverResponse);
-					networkStream.Write(sendBytes, 0, sendBytes.Length);
-					networkStream.Flush();
-					Console.WriteLine(" >> " + serverResponse);*/
 				}
 				catch (Exception ex)
 				{
@@ -230,26 +218,19 @@ namespace ServerEcho
 			switch (mID)
 			{
 				case (int)Enums.AllEnums.SSyncingPlayerMovement:
-					Console.WriteLine("Packet movement: "+id);
-					SendToAllBut(id, data);
-					break;
+					{
+						//Console.WriteLine("Packet movement: " + id);
+						SendToAllBut(id, data);
+						break;
+					}
 				case (int)Enums.AllEnums.SSendingMessage:
-					SendToAllBut(id, data);
-					break;
+					{
+						SendToAllBut(id, data);
+						break;
+					}
 			}
 		}
 			
-		static void Handledata(int id, string msg)
-		{
-			for (int i = 0; i < 20; i++)
-			{
-				if (i != id)
-				{
-					Globals.clients[i].GetStream().Write(Encoding.ASCII.GetBytes(msg), 0, Encoding.ASCII.GetBytes(msg).Length);
-				}
-			}
-		}
-
 		static void NotifyMainPlayerOfAlreadyConnected(int id) // sends already connected to players current player
 		{
 			for (int i = 0; i < 20; i++)
@@ -306,7 +287,7 @@ namespace ServerEcho
 		{
 			ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteBytes(data);
-
+			
 			for (int i = 0; i < 20; i++)
 			{
 				if (Globals.clients[i] != null && Globals.clients[i].Connected)
@@ -314,7 +295,6 @@ namespace ServerEcho
 					if (i != id)
 					{
 						Console.WriteLine("Sending move from "+id+" to " + i);
-						Console.WriteLine(i);
 						Globals.clients[i].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 						Globals.clients[i].GetStream().Flush();
 					}
@@ -323,33 +303,40 @@ namespace ServerEcho
 		}
 
 		static void SendMessage()
-		{ }
+		{
+
+		}
+
+		static void CloseConnection(int id)
+		{
+			Globals.clients[id].Client.Close();
+			//Update player playtime
+		}
 	}
 
 	public static class JwtTokens
 	{
 		private static string key;
 
-		public static string Decypher(String text)
+		public static bool EvaluateToken(string text)
 		{
-			String tst;
 			try
 			{
-				tst = Jose.JWT.Decode(text, Encoding.ASCII.GetBytes(key));
+				Jose.JWT.Decode(text, Encoding.ASCII.GetBytes(key));
+				return true;
 			}
-			catch(Exception)
+			catch (Exception)
 			{
-				return null;
+				return false;
 			}
-
-			return tst;
 		}
 
 		public static void LoadKey(string path)
 		{
-			StreamReader reader = new StreamReader(path);
+			key = "";
+			/*StreamReader reader = new StreamReader(path);
 			key = reader.ReadLine();
-			reader.Close();
+			reader.Close();*/
 		}
 
 	}

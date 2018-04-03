@@ -35,6 +35,8 @@ public class Network : MonoBehaviour
 		{
 			Time.timeScale = 1;
 			myStream = client.GetStream();
+			ByteBuffer buffer = new ByteBuffer();
+
 		}
 	}
 	private void OnGUI()
