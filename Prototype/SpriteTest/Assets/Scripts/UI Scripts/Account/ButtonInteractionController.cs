@@ -13,6 +13,7 @@ public class ButtonInteractionController : MonoBehaviour {
     public void Play()
     {
         PlayerProfile.cID = this.transform.parent.GetComponent<CharacterElementDisplay>().charName.text;
+        PlayerProfile.characterInfo = this.transform.parent.GetComponent<CharacterElementDisplay>().charInfo;
         SceneManager.LoadScene("Test1");
     }
 

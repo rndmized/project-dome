@@ -256,7 +256,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 162f119a0de28904a8958812787f19be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  character: {fileID: 11400000, guid: f72e8fea46cf85a40a8fc635d49e88c7, type: 2}
+  character: {fileID: 0}
 --- !u!114 &114566999727551978
 MonoBehaviour:
   m_ObjectHideFlags: 1

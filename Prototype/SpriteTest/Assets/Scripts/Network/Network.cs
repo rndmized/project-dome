@@ -168,17 +168,20 @@ public class Network : MonoBehaviour
 				{
 					PlayerProfile.uID = uName;
 					mainPlayer.GetComponent<CharacterRenderer>().character = NPC_Char;
-					Instantiate(mainPlayer, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
-					Camera.main.GetComponent<CameraController>().character = mainPlayer.transform;
+					GameObject mPlayer = Instantiate(mainPlayer, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
+                    mPlayer.name = PlayerProfile.uID;
+                    Camera.main.GetComponent<CameraController>().character = mPlayer.transform;
 					break;
 				}
 			case false:
 				{
-					tst.Add(uName, NPC);
+					
 					msg = uName;
 					NPC.GetComponent<CharacterRenderer>().character = NPC_Char;
-					Instantiate(NPC, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
-					break;
+					GameObject nPlayer = Instantiate(NPC, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
+                    nPlayer.name = uName;
+                    tst.Add(uName, nPlayer);
+                    break;
 				}
 		}
 	}
