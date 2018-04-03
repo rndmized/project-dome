@@ -19,8 +19,11 @@ public class Network : MonoBehaviour
 	public GameObject mainPlayer;
 	public GameObject spawnPoint;
 	Dictionary<string, GameObject> tst = new Dictionary<string, GameObject>();
-	//public GameObject npc;
-	//Dictonary<int,GameObject> npcs = new Dictonary<GameObject> ();
+    //public GameObject npc;
+    //Dictonary<int,GameObject> npcs = new Dictonary<GameObject> ();
+
+
+    private GameObject mPlayer;
 
 	public static Network instance;
 
@@ -39,13 +42,13 @@ public class Network : MonoBehaviour
 		if (client.Connected)
 		{
 			myStream = client.GetStream();
-			/*ByteBuffer buffer = new ByteBuffer();
+			ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteString(PlayerProfile.token);
 			buffer.WriteString(PlayerProfile.uID);
 			buffer.WriteString(PlayerProfile.cID);
-			buffer.WriteFloat();
-			buffer.WriteFloat();
-			buffer.WriteFloat();*/
+			buffer.WriteInt(PlayerProfile.characterInfo.char_hairId);
+			buffer.WriteInt(PlayerProfile.characterInfo.char_bodyId);
+			buffer.WriteInt(PlayerProfile.characterInfo.char_clothesId);
 		}
 	}
 	private void OnGUI()
@@ -74,7 +77,7 @@ public class Network : MonoBehaviour
 		{
 			frameCounter = 0;
 			//msg = "X: " + mainPlayer.transform.position.x + " Y: " + mainPlayer.transform.position.y + " Z: " + mainPlayer.transform.position.z;
-			SendMovement(PlayerProfile.uID, mainPlayer.transform.position.x, mainPlayer.transform.position.y, mainPlayer.transform.position.z);
+			SendMovement(PlayerProfile.uID, mPlayer.transform.position.x, mPlayer.transform.position.y, mPlayer.transform.position.z);
 		}
 		frameCounter++;
 	}
@@ -168,7 +171,7 @@ public class Network : MonoBehaviour
 				{
 					PlayerProfile.uID = uName;
 					mainPlayer.GetComponent<CharacterRenderer>().character = NPC_Char;
-					GameObject mPlayer = Instantiate(mainPlayer, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
+					mPlayer = Instantiate(mainPlayer, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
                     mPlayer.name = PlayerProfile.uID;
                     Camera.main.GetComponent<CameraController>().character = mPlayer.transform;
 					break;
