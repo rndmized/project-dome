@@ -20,4 +20,8 @@ export class AppSettingsService {
     return CONFIG.gameServerURL;
   }
 
+  public setGameServerURL( GameURL: string) {
+    CONFIG.gameServerURL = GameURL;
+  }
+
 }

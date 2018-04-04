@@ -13,8 +13,10 @@ export class ServerSettingsService {
   constructor(private http: Http, public appSettings: AppSettingsService, private authenticationService: AuthenticationService) { }
 
 
-  restartServer(): Observable<boolean> {
-    return this.http.post(this.gameServerURL + 'restartServer', { token: this.authenticationService.token })
+restartServer(): Observable<boolean> {
+    let headers = new Headers({ 'Authorization': 'Bearer ' + this.authenticationService.token});
+    let options = new RequestOptions({ headers: headers });
+    return this.http.get(this.gameServerURL + 'restartServer', options)
         .map((response: Response) => {
             let res = response.json();
             if (res.success) {
@@ -40,5 +42,19 @@ changeSettings( port : number , concurrent_players : number): Observable<boolean
           }
       });
 }
+
+getCurrentSettings( port : number , concurrent_players : number): Observable<any> {
+    return this.http.post(this.gameServerURL + 'getSettings', { port : port, concurrent_players: concurrent_players , token: this.authenticationService.token })
+        .map((response: Response) => {
+            let res = response.json();
+            if (res.success) {
+              /** DISPLAY MESSAGE ?? */
+                return true;
+            } else {
+                console.log(res.msg);
+                return false;
+            }
+        });
+  }
 
 }

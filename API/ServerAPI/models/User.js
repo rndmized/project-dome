@@ -19,6 +19,9 @@ var UserSchema = new Schema({
         type: String,
         required: true
     },
+    status:{
+        type: String
+    },
     admin:{
         type: Boolean
     },
@@ -29,6 +32,9 @@ UserSchema.pre('save', function (next) {
     var user = this;
     if (!user.admin) {
         user.admin = false;
+    }
+    if (!user.status) {
+        user.status = 'Allowed';
     }
     next();
 })

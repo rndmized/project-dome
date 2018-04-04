@@ -39,7 +39,7 @@ app.post('/login', function (req, res) {
         /** I fthe user is not found or there is an error return json
          * with a success of 'false' and an accoridng message.
          */
-        if (err ||userDb == null ) {
+        if (err || userDb == null ) {
             return res.json({
                 success: false,
                 msg: "Login Error. User does not exist in database",
@@ -51,6 +51,12 @@ app.post('/login', function (req, res) {
              * toke and return success appending the token to the response.
              */
             if(user.password == userDb.password){
+                if(userDb.status == 'Banned'){
+                    return res.json({
+                        success: false,
+                        msg: "Error while login. User Banned."
+                    });
+                }
                 /** ************************************* WARNING ********************************************************/
                 /** ******************************************************************************************************/
                 /** TODO: Change token creation. This is just for testing and data from user can be extracted from user. */

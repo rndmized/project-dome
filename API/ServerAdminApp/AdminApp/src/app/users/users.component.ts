@@ -24,6 +24,15 @@ export class UsersComponent implements OnInit {
     this.dataService.getRegisteredUsers().subscribe(res => this.users = res);
   }
 
+  public updateUserStatus(user : User){
+    if(user.status == 'Banned'){
+      this.dataService.pardonPlayer(user.username).subscribe();
+    } else {
+      this.dataService.banPlayer(user.username).subscribe();
+    }
+    this.dataService.getRegisteredUsers().subscribe(res => this.users = res);
+  }
+
   openModal($event, user) {
     $event.preventDefault();
     this.user = user;

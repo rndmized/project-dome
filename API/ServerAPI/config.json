@@ -1,3 +1,4 @@
 {
-    "database": "mongodb://admin:admin@ds221339.mlab.com:21339/project-dome"
+    "database": "mongodb://admin:admin@ds221339.mlab.com:21339/project-dome",
+    "gameServer": "http://127.0.0.1:5500/"
 }

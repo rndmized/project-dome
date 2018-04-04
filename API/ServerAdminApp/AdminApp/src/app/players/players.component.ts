@@ -20,4 +20,10 @@ export class PlayersComponent implements OnInit {
   ngOnInit() {
   }
 
+  public kickPlayer( player : OnlinePlayer){
+    this.dataService.kickPlayer(player.username, player.char_name).subscribe();
+    this.dataService.listPlayers().subscribe(res => this.players = res);
+  }
+
+
 }

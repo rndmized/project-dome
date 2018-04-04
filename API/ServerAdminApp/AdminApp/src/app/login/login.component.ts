@@ -19,7 +19,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.authenticationService.logout();
-    console.log("To login");
   }
 
   logIn(): void {
@@ -35,8 +34,6 @@ export class LoginComponent implements OnInit {
                 this.loading = false;
             }
           });
-
- console.log(this.user.username + this.user.password)
   }
 
 }

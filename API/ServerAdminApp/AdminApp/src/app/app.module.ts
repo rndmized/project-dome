@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { HttpModule } from '@angular/http';
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import { AppRouting } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -48,7 +49,8 @@ import { PlayersComponent } from './players/players.component';
     HttpClientModule,
     CommonModule,
     AppRouting,
-    HttpModule
+    HttpModule,
+    BrowserAnimationsModule
   ],
   providers: [
     AuthGuard, 
