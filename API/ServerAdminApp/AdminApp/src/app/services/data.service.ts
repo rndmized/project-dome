@@ -56,7 +56,7 @@ export class DataService {
   }
 
   kickPlayer(player_ID: string, char_ID: string): Observable < boolean > {
-    return this.http.post(this.gameServerURL + 'changeSettings', {
+    return this.http.post(this.gameServerURL + 'kick', {
         player_ID: player_ID,
         char_ID: char_ID,
         token: this.authenticationService.token

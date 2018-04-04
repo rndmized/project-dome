@@ -1,9 +1,9 @@
-<div class="row">
+<div class="col">
   <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
     <div class="card">
       <div class="card-block">
         <h3 class="card-title">Players Online</h3>
-        <p class="card-text">Concurrent players: </p>
+        <p class="card-text">Concurrent players: {{ playersOnline.length }}</p>
       </div>
       <div class="card-footer">
         <a [routerLink]="['/','dash-menu', 'players']" class="btn btn-sm btn-link">Players Online</a>
@@ -14,7 +14,8 @@
     <div class="card">
       <div class="card-block">
         <h3 class="card-title">Server Settings</h3>
-        <p class="card-text"></p>
+        <p class="card-text">Port: {{ settings.port }} </p>
+        <p class="card-text">Concurrent players (Max): {{ settings.concurrent_players }}</p>
       </div>
       <div class="card-footer">
         <a [routerLink]="['/', 'dash-menu', 'settings']" class="btn btn-sm btn-link">Settings</a>
@@ -25,42 +26,7 @@
     <div class="card">
       <div class="card-block">
         <h3 class="card-title">Users</h3>
-        <p class="card-text"></p>
-      </div>
-      <div class="card-footer">
-        <a [routerLink]="['/', 'dash-menu', 'users']" class="btn btn-sm btn-link">Users</a>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-    <div class="card">
-      <div class="card-block">
-        <h3 class="card-title">Players Online</h3>
-        <p class="card-text">Concurrent players: </p>
-      </div>
-      <div class="card-footer">
-        <a [routerLink]="['/','dash-menu', 'players']" class="btn btn-sm btn-link">Players Online</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-    <div class="card">
-      <div class="card-block">
-        <h3 class="card-title">Server Settings</h3>
-        <p class="card-text"></p>
-      </div>
-      <div class="card-footer">
-        <a [routerLink]="['/', 'dash-menu', 'settings']" class="btn btn-sm btn-link">Settings</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-    <div class="card">
-      <div class="card-block">
-        <h3 class="card-title">Users</h3>
-        <p class="card-text"></p>
+        <p class="card-text">Registered Players: {{ users.length }}</p>
       </div>
       <div class="card-footer">
         <a [routerLink]="['/', 'dash-menu', 'users']" class="btn btn-sm btn-link">Users</a>
