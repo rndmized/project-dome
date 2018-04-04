@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { OnlinePlayer } from '../models/OnlinePlayer';
+import { Observable } from 'rxjs/Observable';
+import { DataService } from '../services/data.service';
 
 @Component({
   selector: 'app-players',
@@ -7,8 +10,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PlayersComponent implements OnInit {
 
-  constructor() { }
+  players: Observable<OnlinePlayer[]>;
+  player: OnlinePlayer;
 
+  constructor(public dataService: DataService,
+  ) {
+    this.dataService.listPlayers().subscribe(res => this.players = res);
+  }
   ngOnInit() {
   }
 
