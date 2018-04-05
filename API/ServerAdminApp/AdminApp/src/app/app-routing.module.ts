@@ -10,7 +10,7 @@ import { InAppRootComponent } from './in-app-root/in-app-root.component';
 import { ServerSettingsComponent } from './server-settings/server-settings.component';
 import { PlayersComponent } from './players/players.component';
 
-
+/** App routes */
 const routes: Routes = [ 
   {
     path: '',

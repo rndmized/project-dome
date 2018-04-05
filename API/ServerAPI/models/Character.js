@@ -1,6 +1,7 @@
+/** Database Driver */
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+/** Defining Character Schema */
 var CharacterSchema = new Schema({
 
     userID: {
@@ -30,6 +31,7 @@ var CharacterSchema = new Schema({
     
 });
 
+/** On character creation initialize some values */
 CharacterSchema.pre('save', function (next) {
     var character = this;
     if(!character.char_score){
@@ -37,5 +39,5 @@ CharacterSchema.pre('save', function (next) {
     }
     next();
 })
-
+/** Export Schema */
 module.exports = mongoose.model('Character', CharacterSchema);

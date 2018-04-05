@@ -1,27 +1,38 @@
 <table class="table">
+    <!-- Table Headers -->
   <thead>
     <tr>
-      <th class="left">Id </th>
+      <th class="left">Id</th>
       <th class="left">Name</th>
       <th class="left">Username</th>
       <th class="left">password</th>
       <th class="left">Email</th>
+      <th class="left">Status</th>
       <th class="left">Action</th>
     </tr>
   </thead>
+    <!-- Loop through the elements on the user's list and spawn
+        a record for each user. -->
   <tbody>
     <tr *ngFor="let user of users">
       <td class="left">
-        <a>{{user._id}}</a>
+        <a (click)="openModal($event, user)" href="">{{user._id}}</a>
       </td>
       <td class="left">{{user.full_name}}</td>
       <td class="left">{{user.username}}</td>
       <td class="left">{{user.password}}</td>
       <td class="left">{{user.email}}</td>
-      <td class="left"><button class="btn btn-sm btn-danger-outline" title="Ban player from server">Ban?</button></td>
+      <td class="left">{{user.status}}</td>
+      <td 
+      class="left"><button class="btn btn-sm btn-danger-outline" title="Ban player from server" (click)="updateUserStatus(user)">
+          <!--  Change the display name of the button depending on user status-->  
+        <ng-template [ngIf]="user.status == 'Allowed'">Ban</ng-template>
+          <ng-template [ngIf]="user.status == 'Banned'">Pardon</ng-template>
+      </button></td>
     </tr>
   </tbody>
 </table>
+  <!-- Modal displaying user info in  json format -->
 <clr-modal [(clrModalOpen)]="showModal">
   <h3 class="modal-title">{{user?.name}}</h3>
   <div class="modal-body">

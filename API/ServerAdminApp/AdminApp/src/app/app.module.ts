@@ -5,11 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { HttpModule } from '@angular/http';
+import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import { AppRouting } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { NumberOnlyDirective } from './utils/number.directive';
 
 import { AuthGuard } from './guards/auth.guard';
 import { AuthenticationService } from './services/authentication.service'
@@ -23,6 +25,7 @@ import { InAppRootComponent } from './in-app-root/in-app-root.component';
 import { ServerSettingsComponent } from './server-settings/server-settings.component';
 import { DataService } from './services/data.service';
 import { PlayersComponent } from './players/players.component';
+import { ServerSettingsService } from './services/server-settings.service';
 
 
 
@@ -39,7 +42,8 @@ import { PlayersComponent } from './players/players.component';
     UsersComponent,
     InAppRootComponent,
     ServerSettingsComponent,
-    PlayersComponent
+    PlayersComponent,
+    NumberOnlyDirective
   ],
   imports: [
     BrowserModule,
@@ -48,13 +52,15 @@ import { PlayersComponent } from './players/players.component';
     HttpClientModule,
     CommonModule,
     AppRouting,
-    HttpModule
+    HttpModule,
+    BrowserAnimationsModule
   ],
   providers: [
     AuthGuard, 
     AuthenticationService,
     AppSettingsService,
-    DataService
+    DataService,
+    ServerSettingsService
   ],
   bootstrap: [AppComponent]
 })

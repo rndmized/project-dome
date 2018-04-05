@@ -15,7 +15,7 @@ public static  class PlayerProfile {
     /// <summary>
     /// Game Server Address.
     /// </summary>
-    private static string gameServerAddress = "http://localhost:3000/";
+    private static string gameServerAddress = "http://localhost:5500/";
 
     /// <summary>
     /// Character Data for selected Character to be sent to the game server.

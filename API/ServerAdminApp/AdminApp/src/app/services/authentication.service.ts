@@ -3,7 +3,9 @@ import { AppSettingsService } from './app-settings.service';
 import { Http, Headers, Response } from '@angular/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map'
- 
+
+
+/** Authentication Service   */
 @Injectable()
 export class AuthenticationService {
     public token: string;
@@ -25,7 +27,6 @@ export class AuthenticationService {
             .map((response: Response) => {
                 // login successful if there's a jwt token in the response
                 let token = response.json();
-                console.log(token);
                 if (token.success) {
                     this.token = token.token; 
                     // store username and jwt token in local storage to keep user logged in between page refreshes
