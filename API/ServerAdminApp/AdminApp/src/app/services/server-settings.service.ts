@@ -5,6 +5,8 @@ import { Http, Headers, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs';
 import { Settings } from '../models/settings';
 
+
+/** Retrieve Info from the GameServer and Send Requests to restart and update server */
 @Injectable()
 export class ServerSettingsService {
 
@@ -13,7 +15,9 @@ export class ServerSettingsService {
 
   constructor(private http: Http, public appSettings: AppSettingsService, private authenticationService: AuthenticationService) { }
 
-
+/** Send server request to restart
+ * Send token in the header.
+ */
 restartServer(): Observable<boolean> {
     let headers = new Headers({ 'Authorization': 'Bearer ' + this.authenticationService.token});
     let options = new RequestOptions({ headers: headers });
@@ -21,7 +25,6 @@ restartServer(): Observable<boolean> {
         .map((response: Response) => {
             let res = response.json();
             if (res.success) {
-              /** DISPLAY MESSAGE ?? */
                 return true;
             } else {
                 console.log(res.msg);
@@ -29,13 +32,12 @@ restartServer(): Observable<boolean> {
             }
         });
 }
-
+/** Change server Settings */
 changeSettings( port : number , concurrent_players : number, restart : boolean): Observable<boolean> {
   return this.http.post(this.gameServerURL + 'changeSettings', { port : port, concurrent_players: concurrent_players, restart : restart, token: this.authenticationService.token })
       .map((response: Response) => {
           let res = response.json();
           if (res.success) {
-            /** DISPLAY MESSAGE ?? */
               return true;
           } else {
               console.log(res.msg);
@@ -43,7 +45,7 @@ changeSettings( port : number , concurrent_players : number, restart : boolean):
           }
       });
 }
-
+/** Retrieve Settings from server. */
 getCurrentSettings(): Observable<any> {
     let headers = new Headers({ 'Authorization': 'Bearer ' + this.authenticationService.token});
     let options = new RequestOptions({ headers: headers });

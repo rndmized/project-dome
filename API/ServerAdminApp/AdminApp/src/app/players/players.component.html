@@ -1,4 +1,5 @@
 <table class="table">
+  <!-- Table Headers -->
   <thead>
     <tr>
       <th class="left">Player </th>
@@ -9,6 +10,8 @@
       <th class="left">Action</th>
     </tr>
   </thead>
+  <!-- Loop through the elements on the player list and spawn
+        a record for each player. -->
   <tbody>
     <tr *ngFor="let player of players">
       <td class="left">

@@ -5,6 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { User } from '../models/User';
 import { AuthenticationService } from './authentication.service';
 
+/** Data service Retrieves Player/Users data from Both database and game Server. */
 @Injectable()
 export class DataService {
 
@@ -13,6 +14,7 @@ export class DataService {
 
   constructor(private http: Http, public appSettings: AppSettingsService, private authenticationService: AuthenticationService) {}
 
+  /** Returns a list of Registered Users  */
   getRegisteredUsers(): Observable < any > {
 
     let headers = new Headers({
@@ -34,9 +36,10 @@ export class DataService {
 
   /**************************************** */
   /**************************************** */
-  /**  BEWARE - Further testing requiired!! */
+  /**  BEWARE - Further testing required!! */
   /**************************************** */
   /**************************************** */
+  /** Resturn a list of Online Players */
   listPlayers(): Observable < any > {
     let headers = new Headers({
       'Authorization': 'Bearer ' + this.authenticationService.token
@@ -55,6 +58,7 @@ export class DataService {
       });
   }
 
+  /** Kick a given player from game server */
   kickPlayer(player_ID: string, char_ID: string): Observable < boolean > {
     return this.http.post(this.gameServerURL + 'kick', {
         player_ID: player_ID,
@@ -73,6 +77,7 @@ export class DataService {
       });
   }
 
+  /** Ban a player from login in again */
   banPlayer(username: string): Observable < boolean > {
     let headers = new Headers({
       'Authorization': 'Bearer ' + this.authenticationService.token
@@ -95,7 +100,7 @@ export class DataService {
       });
   }
 
-
+/** Remove the ban from a player */
   pardonPlayer(username: string): Observable < boolean > {
     let headers = new Headers({
       'Authorization': 'Bearer ' + this.authenticationService.token

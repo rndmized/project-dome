@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 
+/** Server Addresses */
 const CONFIG = {
   apiURL: 'http://127.0.0.1:3000/',
   gameServerURL: 'http://127.0.0.1:5500/'
@@ -7,8 +8,6 @@ const CONFIG = {
 
 @Injectable()
 export class AppSettingsService {
-
-
 
   constructor() { }
 

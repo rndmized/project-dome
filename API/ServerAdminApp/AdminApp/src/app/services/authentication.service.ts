@@ -3,7 +3,9 @@ import { AppSettingsService } from './app-settings.service';
 import { Http, Headers, Response } from '@angular/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map'
- 
+
+
+/** Authentication Service   */
 @Injectable()
 export class AuthenticationService {
     public token: string;

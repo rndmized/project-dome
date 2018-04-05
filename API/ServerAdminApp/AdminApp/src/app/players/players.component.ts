@@ -13,6 +13,7 @@ export class PlayersComponent implements OnInit {
   players: Observable<OnlinePlayer[]>;
   player: OnlinePlayer;
 
+  /** Load player data from game server */
   constructor(public dataService: DataService,
   ) {
     this.dataService.listPlayers().subscribe(res => this.players = res);
@@ -20,6 +21,7 @@ export class PlayersComponent implements OnInit {
   ngOnInit() {
   }
 
+  /** On player kicked, refresh the list */
   public kickPlayer( player : OnlinePlayer){
     this.dataService.kickPlayer(player.username, player.char_name).subscribe();
     this.dataService.listPlayers().subscribe(res => this.players = res);

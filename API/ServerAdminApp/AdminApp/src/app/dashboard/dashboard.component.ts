@@ -13,10 +13,12 @@ import { Settings } from '../models/settings';
 })
 export class DashboardComponent implements OnInit {
 
+  /**  */
   public playersOnline = {};
   public users = {};
   public settings = new Settings();
 
+  /** Query Serber for Relevant information */
   constructor(private serverSettingsService : ServerSettingsService, private dataService : DataService) { 
     this.dataService.listPlayers().subscribe(players => this.playersOnline = players);
     this.serverSettingsService.getCurrentSettings().subscribe(settings => this.settings = settings);

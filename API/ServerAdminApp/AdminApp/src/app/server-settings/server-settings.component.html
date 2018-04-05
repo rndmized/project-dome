@@ -1,9 +1,11 @@
+<!-- Display Server Settings -->
 <h2>Server Settings</h2>
 <form #settingsForm="ngForm" (ngSubmit)="onFormSubmit(userForm)">
   <section class="form-block">
     <div class="form-group">
       <label for="formGroupServerPort">Server Port</label>
       <div class="toggle-switch">
+        <!-- Port Number input with Validation -->
         <input myNumberOnly type="text" id="port_number" value="{{ settings.port }}" [(ngModel)]="settings.port" name="port_number" minlength="4"
           maxlength="5" #pnum="ngModel">
         <div *ngIf="pnum.errors && settingsForm.submitted && !isValidFormSubmitted" [ngClass]="'error'">
@@ -21,6 +23,7 @@
     </div>
     <br>
     <div class="form-group">
+      <!-- Concurrent users allowed with Validation -->
       <label for="formConcurrent">Concurrent Users</label>
       <div class="toggle-switch">
         <input myNumberOnly type="text" name="concurrent_users" id="concurrent_users" [(ngModel)]="settings.concurrent_players" value="{{ settings.concurrent_players }}"
@@ -39,6 +42,7 @@
       </div>
     </div>
     <br>
+    <!-- Server Restart toggle -->
     <div class="form-group">
       <label for="formGroupExampleInput">Restart Server</label>
       <div class="toggle-switch">
@@ -49,9 +53,11 @@
   </section>
   <br>
   <div>
-    <button class="btn btn-primary-outline btn-block">Discard changes</button>
+    <!-- Discard Changes Button -->
+    <button class="btn btn-primary-outline btn-block" (click)="discardChanges()">Discard changes</button>
   </div>
   <div>
-    <button class="btn btn-primary btn-block">Save</button>
+    <!-- Submit button -->
+    <button class="btn btn-primary btn-block" type="submit" >Save</button>
   </div>
 </form>

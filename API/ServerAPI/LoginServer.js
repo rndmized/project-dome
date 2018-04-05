@@ -5,9 +5,9 @@ const logger = require('morgan'),
   express = require('express'),
   errorhandler = require('errorhandler'),
   bodyParser = require('body-parser'),
-  mongoose = require('mongoose'), //Temporary mongo db
-  helmet = require('helmet'), //Provides security
-  config = require('./config.json'); //FOR DB CONFIGURATIONS
+  mongoose = require('mongoose'), 
+  helmet = require('helmet'), 
+  config = require('./config.json');
  
 const app = express();
 app.use(helmet())

@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ServerSettingsService } from '../services/server-settings.service';
 import { Settings } from '../models/settings';
 
+/** Server Settings Display and Updates Server Settings info. */
 @Component({
   selector: 'app-server-settings',
   templateUrl: './server-settings.component.html',
@@ -26,6 +27,7 @@ export class ServerSettingsComponent implements OnInit {
   ngOnInit() {
   }
 
+  /** Validate Input from form */
   onFormSubmit() {
     this.isValidFormSubmitted = false;
     if (this.settingsForm.invalid) {
@@ -35,6 +37,10 @@ export class ServerSettingsComponent implements OnInit {
     this.settings = this.settingsForm.value;
     this.serverSettingsService.changeSettings(this.settings.port, this.settings.concurrent_players, this.settings.restart);
     this.settingsForm.reset();
+ }
+  /** Reload Settings */
+ discardChanges(){
+  this.serverSettingsService.getCurrentSettings().subscribe(res => this.settings = res);
  }
 
 }

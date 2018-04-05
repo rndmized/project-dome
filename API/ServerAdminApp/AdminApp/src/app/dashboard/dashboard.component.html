@@ -1,7 +1,9 @@
+<!-- Dashboard display a quick overview of the different sections of the Admin App  -->
 <div class="col">
   <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
     <div class="card">
       <div class="card-block">
+        <!-- Display Players Currently Connected -->
         <h3 class="card-title">Players Online</h3>
         <p class="card-text">Concurrent players: {{ playersOnline.length }}</p>
       </div>
@@ -13,6 +15,7 @@
   <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
     <div class="card">
       <div class="card-block">
+        <!-- Display current Server Settings -->
         <h3 class="card-title">Server Settings</h3>
         <p class="card-text">Port: {{ settings.port }} </p>
         <p class="card-text">Concurrent players (Max): {{ settings.concurrent_players }}</p>
@@ -25,6 +28,7 @@
   <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
     <div class="card">
       <div class="card-block">
+        <!-- Display Users registered -->
         <h3 class="card-title">Users</h3>
         <p class="card-text">Registered Players: {{ users.length }}</p>
       </div>
