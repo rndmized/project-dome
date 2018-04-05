@@ -114,7 +114,7 @@ namespace TCPServer
 			{
 				case "/broadcastMessage":
 					{
-						BroadcastMessage(response, token);
+						ChangeSettings(response, token);
 						break;
 					}
 				case "/kickPlayer":
@@ -135,23 +135,26 @@ namespace TCPServer
 			}
 		}
 
-		/***********HAS TEMP STUFF**************/
-		private void BroadcastMessage(HttpListenerContext response)
+		/***********HAS TEMP STUFF****************/
+		private void ChangeSettings(HttpListenerContext response, string token)
 		{
 			var requestBody = response.Request.InputStream;
 			byte[] data = new byte[4096];
 			requestBody.Read(data, 0, (int)(response.Request.ContentLength64));
 			string msg = Encoding.UTF8.GetString(data);
+			ChangeSettingsJson csj = JsonConvert.DeserializeObject<ChangeSettingsJson>(msg);
 
 			ByteBuffer buffer = new ByteBuffer();
 
-			buffer.WriteInt(14); //TEMP
-			buffer.WriteString(msg);
+			buffer.WriteInt(14); //mudar
+			buffer.WriteString(csj.json_token);
+			buffer.WriteInt(csj.concurrent_players);
+			buffer.WriteInt(csj.port);
 
 			SendToGameServer(buffer.ToArray());
 		}
 
-		/***********HAS TEMP STUFF**************/
+		/***********HAS TEMP STUFF****************/
 		private void ListPlayers(HttpListenerContext response, string token)
 		{
 			List<byte> data = new List<byte>();
@@ -167,10 +170,7 @@ namespace TCPServer
 
 			string json = ConvertToJson(dataFromServer);
 
-			var output = response.Response.OutputStream;
-			output.Write(dataFromServer, 0, dataFromServer.Length); //if I create the json on server side, this is fine
-			output.Flush();
-			output.Close();
+			SendToClient(response,json,200);
 		}
 
 		/***********HAS TEMP STUFF****************/
@@ -197,7 +197,7 @@ namespace TCPServer
 		}
 
 		/***********HAS TEMP STUFF****************/
-		private void KickPlayer(HttpListenerContext response)
+		private void KickPlayer(HttpListenerContext response, string token)
 		{
 			var requestBody = response.Request.InputStream;
 			byte[] data = new byte[4096];
@@ -276,6 +276,7 @@ namespace TCPServer
 			output.Write(buffer, 0, buffer.Length);
 			output.Flush();
 		}
+
 	}
 
 	class PlayerJson
