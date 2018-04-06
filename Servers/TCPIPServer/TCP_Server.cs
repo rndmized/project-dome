@@ -8,13 +8,15 @@ using System.Net;
 using System.Collections.Generic;
 using MongoDB.Driver;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ServerEcho
 {
 	class Globals //Class used to share data between threades
 	{
 		public static TcpClient[] clients = new TcpClient[20];
-		public static Dictionary<string, Player> dicPlayers1 = new Dictionary<string, Player>();
+		public static TcpClient[] httpClient = new TcpClient[20];
+		//public static Dictionary<string, Player> dicPlayers1 = new Dictionary<string, Player>();
 		public static Dictionary<int, Player> dicPlayers = new Dictionary<int, Player>();
 		public static int i = -1;
 		private static Player[] p = new Player[2];
@@ -52,6 +54,7 @@ namespace ServerEcho
 	{
 		private bool run = true;
 		TcpListener serverSocket;
+		TcpListener httpSocket;
 		int counter = 0;
 
 		public TCP_Server(string path)
@@ -60,6 +63,7 @@ namespace ServerEcho
 			//StreamReader reader = new StreamReader(path);
 			//string port = reader.ReadLine();
 			serverSocket  = new TcpListener(IPAddress.Any, 5500);
+			httpSocket = new TcpListener(IPAddress.Any, 5000);
 		}
 
 		static void Main(string[] args)
@@ -69,12 +73,27 @@ namespace ServerEcho
 			tcp.Start();
 			
 		}
-
+		
 		public void Start()
 		{
-			int counter = 0;
-			JwtTokens.LoadKey("");
+			httpSocket.Start();
 			serverSocket.Start();
+
+			Task task = Task.Run(() => 
+			{
+				while (run)
+				{
+					for (int i = 0; i < Globals.httpClient.Length; i++)
+					{
+						Globals.httpClient[i] = new TcpClient();
+						Globals.httpClient[i] = httpSocket.AcceptTcpClient();
+					}
+				}
+			});
+			int counter = 0;
+
+			JwtTokens.LoadKey("");
+			
 			Console.WriteLine(" >> TCP IP Server Started");
 
 			while (run)
@@ -135,7 +154,7 @@ namespace ServerEcho
 		private void doClient() 
 		{
 			int requestCount = 0;
-			byte[] bytesFrom = new byte[10025];
+			byte[] bytesFrom = new byte[4096];
 			bool run = true;
 			requestCount = 0;
 			NetworkStream networkStream = clientSocket.GetStream();
@@ -163,7 +182,7 @@ namespace ServerEcho
 
 			//IF YOU WANT TO TEST WITH THE TEST SCENE, USE THIS CODE
 			ByteBuffer buffer = new ByteBuffer();
-			buffer.WriteInt(0);
+			//buffer.WriteInt(0);
 			buffer.WriteInt((int)Enums.AllEnums.SSendingPlayerID);
 			//buffer.WriteInt(clNo);
 
@@ -175,7 +194,7 @@ namespace ServerEcho
 			buffer.WriteInt(pl.body);
 			buffer.WriteInt(pl.cloths);
 
-			byte[] size = BitConverter.GetBytes(buffer.Size());
+			/*byte[] size = BitConverter.GetBytes(buffer.Size());
 			byte[] aux = buffer.ToArray();
 
 			aux[0] = size[0];
@@ -186,8 +205,9 @@ namespace ServerEcho
 			/*Console.WriteLine(buffer.Size());
 			Console.WriteLine(buffer.ToArray().Length);*/
 			//networkStream = clientSocket.GetStream();
-			Globals.clients[i].GetStream().Write(aux, 0, aux.Length);
+			Globals.clients[clNo].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 			networkStream.Flush();
+			Console.WriteLine(buffer.ToArray().Length+" to "+clNo);
 
 			NotifyAlreadyConnected(clNo, pl);
 			NotifyMainPlayerOfAlreadyConnected(clNo);
@@ -256,7 +276,7 @@ namespace ServerEcho
 					{
 						Console.WriteLine(i);
 						ByteBuffer buffer = new ByteBuffer();
-						buffer.WriteInt(0);
+						//buffer.WriteInt(0);
 						buffer.WriteInt((int)Enums.AllEnums.SSendingAlreadyConnectedToMain);
 						buffer.WriteString(Globals.dicPlayers[i].uName);
 						buffer.WriteString(Globals.dicPlayers[i].cName);
@@ -264,20 +284,20 @@ namespace ServerEcho
 						buffer.WriteInt(Globals.dicPlayers[i].body);
 						buffer.WriteInt(Globals.dicPlayers[i].cloths);
 
-						byte[] size = BitConverter.GetBytes(buffer.Size());
+						/*byte[] size = BitConverter.GetBytes(buffer.Size());
 						byte[] aux = buffer.ToArray();
 
 						aux[0] = size[0];
 						aux[1] = size[1];
 						aux[2] = size[2];
-						aux[3] = size[3];
+						aux[3] = size[3];*/
 
-						Thread.Sleep(150); //If the thread doesnt sleep, the packet is not sent
-										   //Console.WriteLine(Globals.clients[id].GetStream().);
+						//Thread.Sleep(1500); //If the thread doesnt sleep, the packet is not sent
 
+						Console.WriteLine(buffer.ToArray().Length);
 
-						Globals.clients[i].GetStream().Write(aux, 0, aux.Length);
-						Globals.clients[id].GetStream().Flush();
+						Globals.clients[id].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
+						//Globals.clients[id].GetStream().Flush();
 						Console.WriteLine("Sending sync to "+id);
 					}
 				}
@@ -288,7 +308,7 @@ namespace ServerEcho
 		{
 			ByteBuffer buffer = new ByteBuffer();
 
-			buffer.WriteInt(0);
+			//buffer.WriteInt(0);
 			buffer.WriteInt((int)Enums.AllEnums.SSendingMainToAlreadyConnected);
 			buffer.WriteString(p.uName);
 			buffer.WriteString(p.cName);
@@ -296,13 +316,13 @@ namespace ServerEcho
 			buffer.WriteInt(p.body);
 			buffer.WriteInt(p.cloths);
 
-			byte[] size = BitConverter.GetBytes(buffer.Size());
+			/*byte[] size = BitConverter.GetBytes(buffer.Size());
 			byte[] aux = buffer.ToArray();
 
 			aux[0] = size[0];
 			aux[1] = size[1];
 			aux[2] = size[2];
-			aux[3] = size[3];
+			aux[3] = size[3];*/
 
 			for (int i = 0; i < 20; i++)
 			{
@@ -310,7 +330,8 @@ namespace ServerEcho
 				{
 					if (i != id)
 					{
-						Globals.clients[i].GetStream().Write(aux, 0, aux.Length);
+						
+						Globals.clients[i].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 						Globals.clients[i].GetStream().Flush();
 					}
 				}
@@ -401,5 +422,71 @@ namespace ServerEcho
 
 			return (Player)p;
 		}
+	}
+
+	/// <summary>
+	/// The class that handles the incoming connections from clients
+	/// Contains all methods to handle received data packets and send packets to clients
+	/// </summary>
+	public class HandleHttpClient
+	{
+		private TcpClient clientSocket;
+		private int clNo;
+
+		public HandleHttpClient()
+		{
+
+		}
+		public void StartHttpClient(TcpClient inClientSocket, int clineNo)
+		{
+			this.clientSocket = inClientSocket;
+			this.clNo = clineNo;
+			Thread ctThread = new Thread(HandleClient);
+			ctThread.Start();
+		}
+
+		private void HandleClient()
+		{
+			int requestCount = 0;
+			byte[] bytesFrom = new byte[4096];
+			bool run = true;
+			requestCount = 0;
+			NetworkStream networkStream = clientSocket.GetStream();
+
+			while (run)
+			{
+				if(!networkStream.DataAvailable) { Thread.Sleep(50); }
+
+				networkStream.Read(bytesFrom, 0, 4096);
+			}
+		}
+
+		private void HandleID(int id,byte[] data)
+		{
+			switch (id)
+			{
+				case (int)Enums.AllEnums.HChangeSettings:
+					{
+						break;
+					}
+				case (int)Enums.AllEnums.HGetSettings:
+					{
+						break;
+					}
+				case (int)Enums.AllEnums.HKickPlayer:
+					{
+						break;
+					}
+				case (int)Enums.AllEnums.HListPlayers:
+					{
+						break;
+					}
+				case (int)Enums.AllEnums.HRestartServer:
+					{
+						break;
+					}
+			}
+		}
+
 	}
 }

@@ -18,8 +18,8 @@ namespace EnumsServer
 
 			HListPlayers = 10,
 			HKickPlayer = 11,
-			HServerUpTime = 12,
-			HBroadcastMMessage = 13,
+			HGetSettings = 12,
+			HChangeSettings = 13,
 			HRestartServer = 14
 		}
 	}
