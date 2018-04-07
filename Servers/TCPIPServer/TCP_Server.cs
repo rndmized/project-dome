@@ -468,10 +468,12 @@ namespace ServerEcho
 			{
 				case (int)Enums.AllEnums.HChangeSettings:
 					{
+						HChangeSettings(data);
 						break;
 					}
 				case (int)Enums.AllEnums.HGetSettings:
 					{
+						HGetSettings();
 						break;
 					}
 				case (int)Enums.AllEnums.HKickPlayer:
@@ -490,9 +492,9 @@ namespace ServerEcho
 		}
 
 		/// <summary>
-		/// 
+		/// Changes the server's cofiguration file
 		/// </summary>
-		/// <param name="data"></param>
+		/// <param name="data">Byte array containing data received from http server</param>
 		private void HChangeSettings(byte[] data)
 		{
 			ByteBuffer buffer = new ByteBuffer();
@@ -527,7 +529,7 @@ namespace ServerEcho
 		}
 
 		/// <summary>
-		/// 
+		/// Returns server current configuration 
 		/// </summary>
 		private void HGetSettings()
 		{
@@ -536,6 +538,8 @@ namespace ServerEcho
 
 			byte[] buffer = new byte[Encoding.ASCII.GetByteCount(file)];
 			buffer = Encoding.ASCII.GetBytes(file);
+
+			Globals.httpClient[clNo].GetStream().Write(buffer, 0, buffer.Length);
 		}
 
 		/// <summary>
@@ -551,12 +555,36 @@ namespace ServerEcho
 			{
 				if (p.uName == playerid)
 				{
-					Globals.clients[p.socketID].Close();
+					Globals.clients[p.socketID].Close(); //FIXME
 					break;
 				}
 			}
 
-			string a = "";
+			
 		}
+		/// <summary>
+		/// 
+		/// </summary>
+		private void HListPlayers()
+		{
+			ByteBuffer buffer = new ByteBuffer();
+
+			foreach (Player p in Globals.dicPlayers.Values)
+			{
+				buffer.WriteString(p.uName);
+				buffer.WriteString(p.cName);
+				buffer.WriteString(p.playerIP);
+				buffer.WriteInt(p.playtime); //FIXME: Current Playtime
+				buffer.WriteInt(p.playtime); //FIXME: Total PLaytime
+			}
+
+			Globals.httpClient[clNo].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		private void HRestartServer()
+		{ }
 	}
 }
