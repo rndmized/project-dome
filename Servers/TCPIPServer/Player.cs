@@ -10,6 +10,8 @@ namespace ServerEcho
 	{
 		public string uName { get; set; } //User name
 		public string cName { get; set; } //Char name
+		public string playerIP { get; set; }
+
 		public float cX { get; set; }
 		public float cY { get; set; }
 		public float cZ { get; set; }
@@ -19,5 +21,6 @@ namespace ServerEcho
 		public int cloths { get; set; }
 
 		public int socketID { get; set; }
+		public int playtime { get; set; }
 	}
 }
