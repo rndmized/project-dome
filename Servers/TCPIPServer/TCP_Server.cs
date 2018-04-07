@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using MongoDB.Driver;
 using System.IO;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace ServerEcho
 {
@@ -488,5 +489,74 @@ namespace ServerEcho
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="data"></param>
+		private void HChangeSettings(byte[] data)
+		{
+			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteBytes(data);
+
+			int port = buffer.ReadInt();
+			int nOfPlayers = buffer.ReadInt();
+
+			string configFile = "";
+			string line = "";
+
+			StreamReader reader = new StreamReader("config.txt");
+			while ((line = reader.ReadLine()) != null)
+			{
+				if (Regex.IsMatch("^port", line))
+				{
+					configFile += line.Substring(0, line.IndexOf('=')) + port;
+				}
+				else if (Regex.IsMatch("^number", line))
+				{
+					configFile += line.Substring(0, line.IndexOf('=')) + nOfPlayers;
+				}
+				configFile += line;
+			}
+
+			reader.Close();
+
+			StreamWriter writer = new StreamWriter("config.txt");
+			writer.Write(configFile);
+			writer.Close();
+			
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		private void HGetSettings()
+		{
+			StreamReader reader = new StreamReader("config.txt");
+			string file = reader.ReadToEnd();
+
+			byte[] buffer = new byte[Encoding.ASCII.GetByteCount(file)];
+			buffer = Encoding.ASCII.GetBytes(file);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		private void HKickPlayer(byte[] data)
+		{
+			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteBytes(data);
+
+			string playerid = buffer.ReadString();
+			foreach (Player p in Globals.dicPlayers.Values)
+			{
+				if (p.uName == playerid)
+				{
+					Globals.clients[p.socketID].Close();
+					break;
+				}
+			}
+
+			string a = "";
+		}
 	}
 }
