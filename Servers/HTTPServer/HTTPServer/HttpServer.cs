@@ -20,7 +20,6 @@ namespace TCPServer
 	{
 		public static void Main(string[] args)
 		{
-			Console.WriteLine(sizeof(bool));
 			HttpServer a = new HttpServer(8080);
 			a.Run();
 		}
@@ -28,14 +27,13 @@ namespace TCPServer
 	class HttpServer
 	{
 		private HttpListener httpListener;
-		//private BlockingCollection<List<String>> inQueue; //
 		private TcpClient client = new TcpClient();
-		public HttpServer(int port)//, ref ArrayList job)
+		public HttpServer(int port)
 		{
 			httpListener = new HttpListener();
 			httpListener.Prefixes.Add("http://localhost:" + port + "/");
-			//jobs = job;
-			//client.Connect("ip", "port");
+
+			client.Connect("", 8000);
 		}
 
 		public void Run()
@@ -90,7 +88,7 @@ namespace TCPServer
 					}
 				case "/restartServer":
 					{
-						ServerUpTime(response, token);
+						RestartServer(response, token);
 						break;
 					}
 				default:
@@ -146,7 +144,7 @@ namespace TCPServer
 
 			ByteBuffer buffer = new ByteBuffer();
 
-			buffer.WriteInt(14); //mudar
+			buffer.WriteByte((int)EnumsServer.Enums.AllEnums.HChangeSettings); //mudar
 			buffer.WriteString(csj.json_token);
 			buffer.WriteInt(csj.concurrent_players);
 			buffer.WriteInt(csj.port);
@@ -158,7 +156,7 @@ namespace TCPServer
 		private void ListPlayers(HttpListenerContext response, string token)
 		{
 			List<byte> data = new List<byte>();
-			data.Add(12);
+			data.Add((int)EnumsServer.Enums.AllEnums.HListPlayers);
 			data.AddRange(Encoding.ASCII.GetBytes(token));
 			
 			SendToGameServer(data.ToArray());
@@ -177,7 +175,7 @@ namespace TCPServer
 		private void GetSettings(HttpListenerContext response, string token)
 		{
 			List<byte> buffer = new List<byte>();
-			buffer.Add(10); //Mudar
+			buffer.Add((int)EnumsServer.Enums.AllEnums.HGetSettings); //Mudar
 			buffer.AddRange(Encoding.ASCII.GetBytes(token));
 			SendToGameServer(buffer.ToArray());
 
@@ -206,7 +204,7 @@ namespace TCPServer
 			KickPlayerJson p = JsonConvert.DeserializeObject<KickPlayerJson>(json);
 
 			ByteBuffer buffer = new ByteBuffer();
-			buffer.WriteInt(11); //*******TEMP********* change the ID later
+			buffer.WriteByte((int)EnumsServer.Enums.AllEnums.HKickPlayer); //*******TEMP********* change the ID later
 			buffer.WriteString(p.json_token); //*******TEMP********* Deserialize json first
 			buffer.WriteString(p.player_ID);
 			buffer.WriteString(p.char_ID);
