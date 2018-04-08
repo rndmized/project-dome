@@ -20,7 +20,7 @@ namespace ServerEcho
 		public int body { get; set; }
 		public int cloths { get; set; }
 
-		public int socketID { get; set; }
+		//public int socketID { get; set; }
 		public DateTime currentPlaytime { get; set; }
 		public int totalPlaytime { get; set; }
 	}
