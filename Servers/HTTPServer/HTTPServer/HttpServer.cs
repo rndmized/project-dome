@@ -33,7 +33,7 @@ namespace TCPServer
 			httpListener = new HttpListener();
 			httpListener.Prefixes.Add("http://localhost:" + port + "/");
 
-			client.Connect("", 8000);
+			client.Connect("", 5000);
 		}
 
 		public void Run()
@@ -41,38 +41,42 @@ namespace TCPServer
 
 			httpListener.Start();
 			Console.WriteLine(">> HTTP Server started ");
-			var context = httpListener.GetContext(); // The contexts(request) has a field rawUrl and httpMethod that encapsulates the url and method(post,get...)
-			string token = context.Request.Headers.GetValues("token")[0];
 
-			if (token == "")
+			while (true)
 			{
-				switch (context.Request.HttpMethod)
+				var context = httpListener.GetContext(); // The contexts(request) has a field rawUrl and httpMethod that encapsulates the url and method(post,get...)
+				string token = context.Request.Headers.GetValues("token")[0];
+
+				if (true) //validate token
 				{
-					case "GET":
-						{
-							HandleGet(context, token);
-							break;
-						}
-					case "POST":
-						{
-							HandlePost(context, token);
-							break;
-						}
+					switch (context.Request.HttpMethod)
+					{
+						case "GET":
+							{
+								HandleGet(context, token);
+								break;
+							}
+						case "POST":
+							{
+								HandlePost(context, token);
+								break;
+							}
 
+					}
 				}
-			}
-			else
-			{
-				//var response = context.Response;
-				const string responseString = "Token is invalid";
-				byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-				context.Response.ContentLength64 = buffer.Length;
-				context.Response.StatusCode = 403;
-				Stream output = context.Response.OutputStream;
-				output.Write(buffer, 0, buffer.Length);
-				Console.WriteLine(output);
-				output.Close();
-				//Console.ReadKey();
+				else
+				{
+					//var response = context.Response;
+					const string responseString = "Token is invalid";
+					byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+					context.Response.ContentLength64 = buffer.Length;
+					context.Response.StatusCode = 403;
+					Stream output = context.Response.OutputStream;
+					output.Write(buffer, 0, buffer.Length);
+					Console.WriteLine(output);
+					output.Close();
+					//Console.ReadKey();
+				}
 			}
 
 		}
@@ -89,6 +93,12 @@ namespace TCPServer
 				case "/restartServer":
 					{
 						RestartServer(response, token);
+						break;
+					}
+				case "/getSettings":
+					{
+						Console.WriteLine(">> Received getSettings request");
+						GetSettings(response, token);
 						break;
 					}
 				default:
@@ -110,8 +120,9 @@ namespace TCPServer
 		{
 			switch (response.Request.RawUrl)
 			{
-				case "/broadcastMessage":
+				case "/changeSettings":
 					{
+						Console.WriteLine(">> Received changeSettings request");
 						ChangeSettings(response, token);
 						break;
 					}
@@ -145,11 +156,16 @@ namespace TCPServer
 			ByteBuffer buffer = new ByteBuffer();
 
 			buffer.WriteByte((int)EnumsServer.Enums.AllEnums.HChangeSettings); //mudar
-			buffer.WriteString(csj.json_token);
 			buffer.WriteInt(csj.concurrent_players);
 			buffer.WriteInt(csj.port);
 
 			SendToGameServer(buffer.ToArray());
+
+			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
+
+			client.GetStream().Read(data, 0, 1);
+
+			SendToClient(response, "{\"success\":" + Convert.ToBoolean(data[0]) + "}",200);
 		}
 
 		/***********HAS TEMP STUFF****************/
@@ -171,11 +187,16 @@ namespace TCPServer
 			SendToClient(response,json,200);
 		}
 
-		/***********HAS TEMP STUFF****************/
+		/// <summary>
+		/// Gets game server current configuration
+		/// </summary>
+		/// <param name="response">Underlaying in and out streams</param>
+		/// <param name="token">Token for authentication</param>
 		private void GetSettings(HttpListenerContext response, string token)
 		{
 			List<byte> buffer = new List<byte>();
 			buffer.Add((int)EnumsServer.Enums.AllEnums.HGetSettings); //Mudar
+			buffer.AddRange(BitConverter.GetBytes(Encoding.ASCII.GetBytes(token).Length));
 			buffer.AddRange(Encoding.ASCII.GetBytes(token));
 			SendToGameServer(buffer.ToArray());
 
@@ -288,7 +309,6 @@ namespace TCPServer
 
 	class ChangeSettingsJson
 	{
-		public string json_token { get; set; }
 		public int port { get; set; }
 		public int concurrent_players { get; set; }
 	}

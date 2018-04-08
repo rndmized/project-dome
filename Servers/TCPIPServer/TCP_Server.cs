@@ -69,11 +69,13 @@ namespace ServerEcho
 		{
 			StreamReader reader = new StreamReader(path);
 			string line = reader.ReadLine();
-			int port = int.Parse(line.Substring(line.LastIndexOf('=')));
+			int port = int.Parse(line.Substring(line.LastIndexOf('=')+1));
 
 			line = reader.ReadLine();
 
-			int nOfPlayers = int.Parse(line.Substring(line.LastIndexOf('=')));
+			reader.Close();
+
+			int nOfPlayers = int.Parse(line.Substring(line.LastIndexOf('=')+1));
 			Globals.ChangeNoOfPlayers(nOfPlayers);
 
 			serverSocket  = new TcpListener(IPAddress.Any, port);
@@ -83,7 +85,7 @@ namespace ServerEcho
 		static void Main(string[] args)
 		{
 			Globals.FeedDataToArray();
-			TCP_Server tcp = new TCP_Server("");
+			TCP_Server tcp = new TCP_Server("D://config.txt");
 			tcp.Start();
 			
 		}
@@ -101,6 +103,9 @@ namespace ServerEcho
 					{
 						Globals.httpClient[i] = new TcpClient();
 						Globals.httpClient[i] = httpSocket.AcceptTcpClient();
+						Console.WriteLine(">> New connection from http server");
+						HandleHttpClient httpClient = new HandleHttpClient();
+						httpClient.StartHttpClient(Globals.httpClient[i],i);
 					}
 				}
 			});
@@ -109,9 +114,8 @@ namespace ServerEcho
 
 			JwtTokens.LoadKey("path to file containing key");
 			
-			Console.WriteLine(" >> TCP IP Server Started");
-
 			serverstart:
+			Console.WriteLine(" >> TCP IP Server Started");
 			while (Globals.mainRun)
 			{
 				for (int i = 0; i < Globals.clients.Length; i++)
@@ -120,7 +124,7 @@ namespace ServerEcho
 					{
 						Globals.clients[i] = new TcpClient();
 						Globals.clients[i] = serverSocket.AcceptTcpClient();
-						Console.WriteLine(" >> " + "Client No:" + Convert.ToString(counter) + " started! " + Globals.clients[i].Client.LocalEndPoint);
+						Console.WriteLine(" >> Client No:" + Convert.ToString(counter) + " started! " + Globals.clients[i].Client.LocalEndPoint);
 						HandleClinet client = new HandleClinet();
 						client.startClient(Globals.clients[i], counter, Globals.clients[i].Client.LocalEndPoint.ToString());
 						counter++;
@@ -129,10 +133,9 @@ namespace ServerEcho
 
 			}
 
-			
+			CloseSocket();
+			Console.WriteLine(">> Closing Server Socket");
 			serverSocket.Stop();
-			Console.WriteLine(" >> " + "exit");
-
 			if (Globals.restart)
 			{
 				//re read config file
@@ -150,10 +153,11 @@ namespace ServerEcho
 				if (Globals.clients[i] != null)
 				{
 					//update db
+					Console.WriteLine("Closing socket "+i+1);
 					Globals.clients[i].Close();
+					Globals.clients[i] = null;
 				}
 			}
-			serverSocket.Stop();
 		}
 	}
 
@@ -199,7 +203,7 @@ namespace ServerEcho
 			pl.head = buffer.ReadInt();
 			pl.body = buffer.ReadInt();
 			pl.cloths = buffer.ReadInt();
-			pl.socketID = clNo;
+			//pl.socketID = clNo;
 			
 			Globals.dicPlayers.Add(clNo, pl);
 
@@ -273,7 +277,7 @@ namespace ServerEcho
 				}
 			}
 
-			CloseConnection(clNo);
+			//CloseConnection(clNo);
 		}
 
 		static void HandleMessage(int mID,int id, byte[] data)
@@ -404,6 +408,7 @@ namespace ServerEcho
 
 		public static bool EvaluateToken(string text)
 		{
+			return true;
 			try
 			{
 				Jose.JWT.Decode(text, Encoding.ASCII.GetBytes(key));
@@ -480,7 +485,7 @@ namespace ServerEcho
 
 			while (run)
 			{
-				if(!networkStream.DataAvailable) { Thread.Sleep(50); }
+				while(!networkStream.DataAvailable) { Thread.Sleep(50); }
 
 				networkStream.Read(bytesFrom, 0, 4096);
 
@@ -494,6 +499,7 @@ namespace ServerEcho
 			}
 		}
 
+		
 		private void HandleID(short id,byte[] data)
 		{
 			switch (id)
@@ -527,9 +533,10 @@ namespace ServerEcho
 		}
 
 		/// <summary>
+		/// **************Change file path*******************
 		/// Changes the server's cofiguration file
 		/// </summary>
-		/// <param name="data">Byte array containing data received from http server</param>
+		/// <param name="data">Byte array containing new server configuration</param>
 		private void HChangeSettings(byte[] data)
 		{
 			ByteBuffer buffer = new ByteBuffer();
@@ -541,12 +548,12 @@ namespace ServerEcho
 			string configFile = "";
 			string line = "";
 
-			StreamReader reader = new StreamReader("config.txt");
+			StreamReader reader = new StreamReader("D://config.txt");
 			while ((line = reader.ReadLine()) != null)
 			{
 				if (Regex.IsMatch("^port", line))
 				{
-					configFile += line.Substring(0, line.IndexOf('=')) + port;
+					configFile += line.Substring(0, line.IndexOf('=')) + port+"\n";
 				}
 				else if (Regex.IsMatch("^number", line))
 				{
@@ -556,11 +563,17 @@ namespace ServerEcho
 			}
 
 			reader.Close();
-
-			StreamWriter writer = new StreamWriter("config.txt");
-			writer.Write(configFile);
-			writer.Close();
-			
+			try
+			{
+				StreamWriter writer = new StreamWriter("D://configTST.txt");
+				writer.Write(configFile);
+				writer.Close();
+			}
+			catch (Exception)
+			{
+				SendDefaultRespose(false);
+			}
+			SendDefaultRespose(true);
 		}
 
 		/// <summary>
@@ -568,13 +581,22 @@ namespace ServerEcho
 		/// </summary>
 		private void HGetSettings()
 		{
-			StreamReader reader = new StreamReader("config.txt");
-			string file = reader.ReadToEnd();
+			List<byte> buffer = new List<byte>();
+			StreamReader reader = new StreamReader("D:\\config.txt");
+			string line = reader.ReadLine();
+			int aux= int.Parse(line.Substring(line.LastIndexOf('=') + 1));
+			buffer.AddRange(BitConverter.GetBytes(aux));
 
-			byte[] buffer = new byte[Encoding.ASCII.GetByteCount(file)];
-			buffer = Encoding.ASCII.GetBytes(file);
+			line = reader.ReadLine();
+			aux = int.Parse(line.Substring(line.LastIndexOf('=') + 1));
+			buffer.AddRange(BitConverter.GetBytes(aux));
 
-			Globals.httpClient[clNo].GetStream().Write(buffer, 0, buffer.Length);
+			reader.Close();
+
+			/*byte[] buffer = new byte[Encoding.ASCII.GetByteCount(file)];
+			buffer = Encoding.ASCII.GetBytes(file);*/
+
+			Globals.httpClient[clNo].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 		}
 
 		/// <summary>
@@ -587,14 +609,15 @@ namespace ServerEcho
 			buffer.WriteBytes(data);
 
 			string playerid = buffer.ReadString();
-			foreach (Player p in Globals.dicPlayers.Values)
+			for (int i = 0; i < Globals.dicPlayers.Count; i++)
 			{
-				if (p.uName == playerid)
+				if (Globals.dicPlayers[i].uName == playerid)
 				{
 					//update playtime on db
 					//update index
-					Globals.clients[p.socketID].Close();
-					Globals.clients[p.socketID] = null;
+					Globals.clients[i].Close();
+					Globals.clients[i] = null;
+					Globals.i = i;
 					break;
 				}
 			}
@@ -609,6 +632,7 @@ namespace ServerEcho
 		{
 			ByteBuffer buffer = new ByteBuffer();
 			TimeSpan aux = new TimeSpan();
+			
 			foreach (Player p in Globals.dicPlayers.Values)
 			{
 				buffer.WriteString(p.uName);
@@ -616,16 +640,26 @@ namespace ServerEcho
 				buffer.WriteString(p.playerIP);
 				aux = DateTime.Now - p.currentPlaytime;
 				buffer.WriteInt(aux.Hours*60+aux.Minutes); 
-				buffer.WriteInt(p.totalPlaytime+(aux.Hours * 60 + aux.Minutes)); 
+				buffer.WriteInt(p.totalPlaytime+(aux.Hours * 60 + aux.Minutes));
 			}
 
 			Globals.httpClient[clNo].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 		}
 
 		/// <summary>
-		/// 
+		/// Set the flag to restart the server
 		/// </summary>
 		private void HRestartServer()
-		{ }
+		{
+			Globals.restart = true;
+			Globals.mainRun = false;
+		}
+
+		private void SendDefaultRespose(bool success)
+		{
+			byte[] buffer = new byte[1];
+			buffer = BitConverter.GetBytes(success);
+			Globals.httpClient[clNo].GetStream().Write(buffer, 0, buffer.Length);
+		}
 	}
 }
