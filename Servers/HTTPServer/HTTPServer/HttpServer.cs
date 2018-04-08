@@ -67,15 +67,16 @@ namespace TCPServer
 				else
 				{
 					//var response = context.Response;
-					const string responseString = "Token is invalid";
-					byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+					const string json = "{ error: \"Authentication failed\"}";
+					SendToClient(context, json, 401);
+					/*byte[] buffer = Encoding.UTF8.GetBytes(responseString);
 					context.Response.ContentLength64 = buffer.Length;
 					context.Response.StatusCode = 403;
 					Stream output = context.Response.OutputStream;
 					output.Write(buffer, 0, buffer.Length);
 					Console.WriteLine(output);
 					output.Close();
-					//Console.ReadKey();
+					//Console.ReadKey();*/
 				}
 			}
 
@@ -87,11 +88,13 @@ namespace TCPServer
 			{
 				case "/listPlayers":
 					{
+						Console.WriteLine(">> Received listPlayers request");
 						ListPlayers(response, token);
 						break;
 					}
 				case "/restartServer":
 					{
+						Console.WriteLine(">> Received restartServer request");
 						RestartServer(response, token);
 						break;
 					}
@@ -103,14 +106,15 @@ namespace TCPServer
 					}
 				default:
 					{
-						String json = "{ error: \"Not found\"}";
-						var buffer = Encoding.UTF8.GetBytes(json);
+						string json = "{ error: \"Not found\"}";
+						SendToClient(response, json, 404);
+						/*var buffer = Encoding.UTF8.GetBytes(json);
 						response.Response.ContentLength64 = buffer.Length;
 						response.Response.StatusCode = 404;
 						var output = response.Response.OutputStream;
 						output.Write(buffer, 0, buffer.Length);
 						output.Flush();
-						output.Close();
+						output.Close();*/
 						break;
 					}
 			}
@@ -128,23 +132,29 @@ namespace TCPServer
 					}
 				case "/kickPlayer":
 					{
+						Console.WriteLine(">> Received kickPlayer request");
 						KickPlayer(response, token);
 						break;
 					}
 				default:
 					{
-						String json = "{ error: \"Not found\"}";
-						var buffer = Encoding.UTF8.GetBytes(json);
+						string json = "{ error: \"Not found\"}";
+						SendToClient(response, json, 404);
+						/*var buffer = Encoding.UTF8.GetBytes(json);
 						var output = response.Response.OutputStream;
 						output.Write(buffer, 0, buffer.Length);
 						output.Flush();
-						output.Close();
+						output.Close();*/
 						break;
 					}
 			}
 		}
 
-		/***********HAS TEMP STUFF****************/
+		/// <summary>
+		/// Sends new configuration to game server
+		/// </summary>
+		/// <param name="response">Underlaying in and out streams</param>
+		/// <param name="token">Token for authentication</param>
 		private void ChangeSettings(HttpListenerContext response, string token)
 		{
 			var requestBody = response.Request.InputStream;

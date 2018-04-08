@@ -171,6 +171,7 @@ namespace ServerEcho
 		private int clNo;
 		private int count = 1;
 		private string ip;
+		private bool run = true;
 
 		public void startClient(TcpClient inClientSocket, int clineNo, string ip)
 		{
@@ -243,7 +244,7 @@ namespace ServerEcho
 			NotifyMainPlayerOfAlreadyConnected(clNo);
 
 			count++;
-			while (Globals.threadsRun)
+			while (Globals.threadsRun && run)
 			{
 				try
 				{
@@ -262,6 +263,7 @@ namespace ServerEcho
 						if (packageID == (int)Enums.AllEnums.SCloseConnection)
 						{
 							run = false;
+							break;
 						}
 
 						HandleMessage(packageID, clNo,buffer.ToArray()); 
@@ -277,7 +279,7 @@ namespace ServerEcho
 				}
 			}
 
-			//CloseConnection(clNo);
+			CloseConnection(clNo);
 		}
 
 		static void HandleMessage(int mID,int id, byte[] data)
@@ -371,14 +373,12 @@ namespace ServerEcho
 
 		static void SendToAllBut(int id, byte[] data)
 		{
-			
 			for (int i = 0; i < 20; i++)
 			{
 				if (Globals.clients[i] != null && Globals.clients[i].Connected)
 				{
 					if (i != id)
 					{
-						Console.WriteLine("Sending move from "+id+" to " + i);
 						Globals.clients[i].GetStream().Write(data, 0, data.Length);
 						Globals.clients[i].GetStream().Flush();
 					}
@@ -386,18 +386,50 @@ namespace ServerEcho
 			}
 		}
 
-		static void SendMessage()
+		static void SendToSpecific(int id, byte[] data)
 		{
+			if (Globals.clients[id] != null && Globals.clients[id].Connected)
+			{
+				Globals.clients[id].GetStream().Write(data, 0, data.Length);
+				Globals.clients[id].GetStream().Flush();
+				
+			}
+			
+		}
 
+		static void SendMessage(int id, byte[] data,bool sendToAll)
+		{
+			if (sendToAll)
+				SendToAllBut(id, data);
+			else
+			{
+				ByteBuffer buffer = new ByteBuffer();
+				buffer.WriteBytes(data);
+				buffer.ReadInt();
+				string pName = buffer.ReadString();
+				int size = Globals.dicPlayers.Count; //Saves size in memory to avoid exeception if a player disconnect during execution of this method
+				for (int i = 0; i < size; i++)
+				{
+					if (pName == Globals.dicPlayers[i].uName)
+					{
+						SendToSpecific(Globals.dicPlayers[i].socketID,data);
+						break;
+					}
+				}
+			}
 		}
 
 		//UPDATE DB
 		static void CloseConnection(int id)
 		{
-			byte[] buffer = new byte[4]; //because the client expects an int
-			buffer[0] = (int)Enums.AllEnums.SCloseConnection;
-			SendToAllBut(id, buffer);
+			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteInt((int)Enums.AllEnums.SCloseConnection);
+			buffer.WriteString(Globals.dicPlayers[id].uName);
+
+			SendToAllBut(id, buffer.ToArray());
+			Globals.dicPlayers.Remove(id);
 			Globals.clients[id].Client.Close();
+			Globals.clients[id] = null;
 			//Update player playtime
 		}
 	}
