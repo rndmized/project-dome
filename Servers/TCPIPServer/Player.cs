@@ -21,6 +21,7 @@ namespace ServerEcho
 		public int cloths { get; set; }
 
 		public int socketID { get; set; }
-		public int playtime { get; set; }
+		public DateTime currentPlaytime { get; set; }
+		public int totalPlaytime { get; set; }
 	}
 }
