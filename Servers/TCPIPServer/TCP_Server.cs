@@ -17,22 +17,22 @@ namespace ServerEcho
 	{
 		public static TcpClient[] clients = new TcpClient[20];
 		public static TcpClient[] httpClient = new TcpClient[2];
-		//public static Dictionary<string, Player> dicPlayers1 = new Dictionary<string, Player>();
 		public static Dictionary<int, Player> dicPlayers = new Dictionary<int, Player>();
-		public static int i = -1;
-		private static Player[] p = new Player[2];
+		public static int i = 0;
+		public static int port = 0;
 		public static bool restart = false;
 		public static bool mainRun = true;
-		public static bool threadsRun = false;
+		public static bool threadsRun = true;
 
+		private static Player[] p = new Player[3];
 		public static void FeedDataToArray()
 		{
-			p[0] = new Player();
-			p[0].cName = "ubaduba";
-			p[0].uName = "Player1";
-			p[0].head = 4;
-			p[0].body = 0;
-			p[0].cloths = 4;
+			p[2] = new Player();
+			p[2].cName = "ubaduba";
+			p[2].uName = "Player1";
+			p[2].head = 4;
+			p[2].body = 0;
+			p[2].cloths = 4;
 
 			p[1] = new Player();
 			p[1].cName = "sfsadfsafd";
@@ -60,7 +60,7 @@ namespace ServerEcho
 	/// </summary>
 	class TCP_Server
 	{
-		private int port;
+		private string path;
 		private bool run = true;
 		TcpListener serverSocket;
 		TcpListener httpSocket;
@@ -68,9 +68,10 @@ namespace ServerEcho
 
 		public TCP_Server(string path)
 		{
+			this.path = path;
 			LoadConfig(path);
 
-			serverSocket  = new TcpListener(IPAddress.Any, port);
+			serverSocket  = new TcpListener(IPAddress.Any, Globals.port);
 			httpSocket = new TcpListener(IPAddress.Any, 5000);
 		}
 
@@ -78,7 +79,7 @@ namespace ServerEcho
 		{
 			StreamReader reader = new StreamReader(path);
 			string line = reader.ReadLine();
-			port = int.Parse(line.Substring(line.LastIndexOf('=') + 1));
+			Globals.port = int.Parse(line.Substring(line.LastIndexOf('=') + 1));
 
 			line = reader.ReadLine();
 
@@ -87,6 +88,7 @@ namespace ServerEcho
 			int nOfPlayers = int.Parse(line.Substring(line.LastIndexOf('=') + 1));
 			Globals.ChangeNoOfPlayers(nOfPlayers);
 		}
+
 		static void Main(string[] args)
 		{
 			Globals.FeedDataToArray();
@@ -98,7 +100,7 @@ namespace ServerEcho
 		public void Start()
 		{
 			httpSocket.Start();
-			serverSocket.Start();
+			
 
 			Task task = Task.Run(() => 
 			{
@@ -107,7 +109,11 @@ namespace ServerEcho
 					for (int i = 0; i < Globals.httpClient.Length; i++)
 					{
 						Globals.httpClient[i] = new TcpClient();
-						Globals.httpClient[i] = httpSocket.AcceptTcpClient();
+						try
+						{
+							Globals.httpClient[i] = httpSocket.AcceptTcpClient();
+						}
+						catch { break; }
 						Console.WriteLine(">> New connection from http server");
 						HandleHttpClient httpClient = new HandleHttpClient();
 						httpClient.StartHttpClient(Globals.httpClient[i],i);
@@ -120,15 +126,17 @@ namespace ServerEcho
 			JwtTokens.LoadKey("path to file containing key");
 			
 			serverstart:
-			Console.WriteLine(" >> TCP IP Server Started");
+			serverSocket.Start();
+			Console.WriteLine(">> TCP IP Server Started on port "+ Globals.port);
 			while (Globals.mainRun)
 			{
-				for (int i = 0; i < Globals.clients.Length; i++)
+				for (int i=0; i < Globals.clients.Length; i++)
 				{
 					if (Globals.clients[i] == null)
 					{
 						Globals.clients[i] = new TcpClient();
 						Globals.clients[i] = serverSocket.AcceptTcpClient();
+						if (!Globals.mainRun) break;
 						Console.WriteLine(" >> Client No:" + Convert.ToString(counter) + " started! " + Globals.clients[i].Client.LocalEndPoint);
 						HandleClinet client = new HandleClinet();
 						client.startClient(Globals.clients[i], counter, Globals.clients[i].Client.LocalEndPoint.ToString());
@@ -143,10 +151,12 @@ namespace ServerEcho
 			serverSocket.Stop();
 			if (Globals.restart)
 			{
-				//re read config file
 				Globals.restart = false;
 				Globals.threadsRun = true;
 				Globals.mainRun = true;
+
+				LoadConfig(path);
+				serverSocket = new TcpListener(IPAddress.Any, Globals.port);
 				goto serverstart;
 			}
 		}
@@ -566,31 +576,14 @@ namespace ServerEcho
 		{
 			ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteBytes(data);
-
-			int port = buffer.ReadInt();
+			buffer.ReadByte();
 			int nOfPlayers = buffer.ReadInt();
+			int port = buffer.ReadInt();
 
-			string configFile = "";
-			string line = "";
-
-			StreamReader reader = new StreamReader("D://config.txt");
-			while ((line = reader.ReadLine()) != null)
-			{
-				if (Regex.IsMatch("^port", line))
-				{
-					configFile += line.Substring(0, line.IndexOf('=')) + port+"\n";
-				}
-				else if (Regex.IsMatch("^number", line))
-				{
-					configFile += line.Substring(0, line.IndexOf('=')) + nOfPlayers;
-				}
-				configFile += line;
-			}
-
-			reader.Close();
+			string configFile = "port=" + port+ System.Environment.NewLine+"NumberOfPlayers=" +nOfPlayers;
 			try
 			{
-				StreamWriter writer = new StreamWriter("D://configTST.txt");
+				StreamWriter writer = new StreamWriter("D://config.txt");
 				writer.Write(configFile);
 				writer.Close();
 			}
@@ -679,6 +672,10 @@ namespace ServerEcho
 		{
 			Globals.restart = true;
 			Globals.mainRun = false;
+			Console.WriteLine(Globals.mainRun);
+			TcpClient client = new TcpClient();
+			client.Connect("", Globals.port);
+			client.Close();
 		}
 
 		private void SendDefaultRespose(bool success)
