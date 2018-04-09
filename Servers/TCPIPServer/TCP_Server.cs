@@ -60,6 +60,7 @@ namespace ServerEcho
 	/// </summary>
 	class TCP_Server
 	{
+		private int port;
 		private bool run = true;
 		TcpListener serverSocket;
 		TcpListener httpSocket;
@@ -67,21 +68,25 @@ namespace ServerEcho
 
 		public TCP_Server(string path)
 		{
-			StreamReader reader = new StreamReader(path);
-			string line = reader.ReadLine();
-			int port = int.Parse(line.Substring(line.LastIndexOf('=')+1));
-
-			line = reader.ReadLine();
-
-			reader.Close();
-
-			int nOfPlayers = int.Parse(line.Substring(line.LastIndexOf('=')+1));
-			Globals.ChangeNoOfPlayers(nOfPlayers);
+			LoadConfig(path);
 
 			serverSocket  = new TcpListener(IPAddress.Any, port);
 			httpSocket = new TcpListener(IPAddress.Any, 5000);
 		}
 
+		private void LoadConfig(string path)
+		{
+			StreamReader reader = new StreamReader(path);
+			string line = reader.ReadLine();
+			port = int.Parse(line.Substring(line.LastIndexOf('=') + 1));
+
+			line = reader.ReadLine();
+
+			reader.Close();
+
+			int nOfPlayers = int.Parse(line.Substring(line.LastIndexOf('=') + 1));
+			Globals.ChangeNoOfPlayers(nOfPlayers);
+		}
 		static void Main(string[] args)
 		{
 			Globals.FeedDataToArray();
@@ -263,6 +268,7 @@ namespace ServerEcho
 						if (packageID == (int)Enums.AllEnums.SCloseConnection)
 						{
 							run = false;
+							//CloseConnection(clNo);
 							break;
 						}
 
@@ -279,7 +285,7 @@ namespace ServerEcho
 				}
 			}
 
-			CloseConnection(clNo);
+			
 		}
 
 		static void HandleMessage(int mID,int id, byte[] data)
@@ -371,7 +377,7 @@ namespace ServerEcho
 			}
 		}
 
-		static void SendToAllBut(int id, byte[] data)
+		public static void SendToAllBut(int id, byte[] data)
 		{
 			for (int i = 0; i < 20; i++)
 			{
@@ -419,19 +425,6 @@ namespace ServerEcho
 			}
 		}
 
-		//UPDATE DB
-		static void CloseConnection(int id)
-		{
-			ByteBuffer buffer = new ByteBuffer();
-			buffer.WriteInt((int)Enums.AllEnums.SCloseConnection);
-			buffer.WriteString(Globals.dicPlayers[id].uName);
-
-			SendToAllBut(id, buffer.ToArray());
-			Globals.dicPlayers.Remove(id);
-			Globals.clients[id].Client.Close();
-			Globals.clients[id] = null;
-			//Update player playtime
-		}
 	}
 
 	public static class JwtTokens
@@ -647,9 +640,10 @@ namespace ServerEcho
 				{
 					//update playtime on db
 					//update index
-					Globals.clients[i].Close();
+					CloseConnection(i);
+					/*Globals.clients[i].Close();
 					Globals.clients[i] = null;
-					Globals.i = i;
+					Globals.i = i;*/
 					break;
 				}
 			}
@@ -692,6 +686,20 @@ namespace ServerEcho
 			byte[] buffer = new byte[1];
 			buffer = BitConverter.GetBytes(success);
 			Globals.httpClient[clNo].GetStream().Write(buffer, 0, buffer.Length);
+		}
+
+		//UPDATE DB
+		static void CloseConnection(int id)
+		{
+			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteInt((int)Enums.AllEnums.SCloseConnection);
+			buffer.WriteString(Globals.dicPlayers[id].uName);
+
+			HandleClinet.SendToAllBut(id, buffer.ToArray());
+			Globals.dicPlayers.Remove(id);
+			Globals.clients[id].Client.Close();
+			Globals.clients[id] = null;
+			//Update player playtime
 		}
 	}
 }
