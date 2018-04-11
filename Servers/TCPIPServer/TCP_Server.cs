@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using MongoDB.Driver;
 using System.IO;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
+using MongoDB.Bson;
 
 namespace ServerEcho
 {
@@ -123,7 +123,7 @@ namespace ServerEcho
 
 			int counter = 0;
 
-			JwtTokens.LoadKey("path to file containing key");
+			JwtTokens.LoadKey("D://key.txt");
 			
 			serverstart:
 			serverSocket.Start();
@@ -219,7 +219,9 @@ namespace ServerEcho
 			pl.head = buffer.ReadInt();
 			pl.body = buffer.ReadInt();
 			pl.cloths = buffer.ReadInt();
-			//pl.socketID = clNo;
+			pl.currentPlaytime = DateTime.Now;
+			pl.totalPlaytime = buffer.ReadInt();
+			pl.socketID = clNo;
 			
 			Globals.dicPlayers.Add(clNo, pl);
 
@@ -304,18 +306,27 @@ namespace ServerEcho
 			{
 				case (int)Enums.AllEnums.SSyncingPlayerMovement:
 					{
-						//Console.WriteLine("Packet movement: " + id);
+						SendToAllBut(id, data);
+						break;
+					}
+				case (int)Enums.AllEnums.SSendingMessageWorld:
+					{
 						SendToAllBut(id, data);
 						break;
 					}
 				case (int)Enums.AllEnums.SSendingMessage:
 					{
-						SendToAllBut(id, data);
+						SendMessage(id, data);
 						break;
 					}
 			}
 		}
-			
+
+		/// <summary>
+		/// Sends already connected clients to the connecting one
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="p"></param>
 		static void NotifyMainPlayerOfAlreadyConnected(int id) // sends already connected to players current player
 		{
 			for (int i = 0; i < 20; i++)
@@ -354,6 +365,11 @@ namespace ServerEcho
 			}
 		}
 
+		/// <summary>
+		/// Notifies already connected clients of new player
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="p"></param>
 		static void NotifyAlreadyConnected(int id, Player p) // sends current player to already connected player 
 		{
 			ByteBuffer buffer = new ByteBuffer();
@@ -387,6 +403,11 @@ namespace ServerEcho
 			}
 		}
 
+		/// <summary>
+		/// Sends a packet to a all connected client but a specific one
+		/// </summary>
+		/// <param name="id">client's id</param>
+		/// <param name="data">Array with packet data to be sent</param>
 		public static void SendToAllBut(int id, byte[] data)
 		{
 			for (int i = 0; i < 20; i++)
@@ -402,6 +423,11 @@ namespace ServerEcho
 			}
 		}
 
+		/// <summary>
+		/// Sends a packet to a specific connected client
+		/// </summary>
+		/// <param name="id">client's id</param>
+		/// <param name="data">Array with packet data to be sent</param>
 		static void SendToSpecific(int id, byte[] data)
 		{
 			if (Globals.clients[id] != null && Globals.clients[id].Connected)
@@ -413,26 +439,32 @@ namespace ServerEcho
 			
 		}
 
-		static void SendMessage(int id, byte[] data,bool sendToAll)
+		/// <summary>
+		/// Sends a message from a player to another
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="data"></param>
+		/// <param name="sendToAll"></param>
+		static void SendMessage(int id, byte[] data)
 		{
-			if (sendToAll)
-				SendToAllBut(id, data);
-			else
-			{
-				ByteBuffer buffer = new ByteBuffer();
+			ByteBuffer buffer = new ByteBuffer();
 				buffer.WriteBytes(data);
 				buffer.ReadInt();
 				string pName = buffer.ReadString();
 				int size = Globals.dicPlayers.Count; //Saves size in memory to avoid exeception if a player disconnect during execution of this method
 				for (int i = 0; i < size; i++)
 				{
-					if (pName == Globals.dicPlayers[i].uName)
+					try
 					{
-						SendToSpecific(Globals.dicPlayers[i].socketID,data);
-						break;
+						if (pName == Globals.dicPlayers[i].uName)
+						{
+							SendToSpecific(Globals.dicPlayers[i].socketID, data);
+							break;
+						}
 					}
+					catch (IndexOutOfRangeException) { break; }
 				}
-			}
+			
 		}
 
 	}
@@ -457,14 +489,16 @@ namespace ServerEcho
 
 		public static void LoadKey(string path)
 		{
-			key = "";
-			/*StreamReader reader = new StreamReader(path);
+			StreamReader reader = new StreamReader(path);
 			key = reader.ReadLine();
-			reader.Close();*/
+			reader.Close();
 		}
 
 	}
 
+	/// <summary>
+	/// Connector to the MongoDB database
+	/// </summary>
 	public class DB //Singleton
 	{
 		private DB _db;
@@ -472,12 +506,12 @@ namespace ServerEcho
 		MongoClient client;
 
 		private DB() { }
-		public DB getInstance(string path, string port, string dbName)
+		public DB getInstance(string path, string dbName)
 		{
 			if (_db == null)
 			{
 				_db = new DB();
-				client = new MongoClient();
+				client = new MongoClient(path); // "mongodb://localhost:27017"
 				mongodb = client.GetDatabase(dbName);
 			}
 
@@ -488,11 +522,21 @@ namespace ServerEcho
 			var coll = mongodb.GetCollection<Player>(""); //collection's name in db
 
 			var p = coll.Find(pl => pl.uName == uName && pl.cName==cName);
-
+		
 			return (Player)p;
 		}
+
 		public void UpdatePlayer(Player p)
-		{ }
+		{
+			var collection = mongodb.GetCollection<BsonDocument>("users");
+
+			var aux = DateTime.Now - p.currentPlaytime;
+			
+			var filter = Builders<BsonDocument>.Filter.Eq("username", p.uName);
+			var update = Builders<BsonDocument>.Update.Set("playtime", aux.Hours * 60 + aux.Minutes);
+
+			collection.UpdateOne(filter, update);
+		}
 	}
 
 	/// <summary>

@@ -20,7 +20,7 @@ namespace TCPServer
 	{
 		public static void Main(string[] args)
 		{
-			HttpServer a = new HttpServer(8080);
+			HttpServer a = new HttpServer(8081);
 			a.Run();
 		}
 	}
@@ -254,8 +254,10 @@ namespace TCPServer
 		private void RestartServer(HttpListenerContext response, string token)
 		{
 			List<byte> buffer = new List<byte>();
-			buffer.Add(10); //Mudar
+			buffer.Add((int)EnumsServer.Enums.AllEnums.HRestartServer); //Mudar
+			buffer.AddRange(BitConverter.GetBytes(Encoding.ASCII.GetBytes(token).Length));
 			buffer.AddRange(Encoding.ASCII.GetBytes(token));
+
 			SendToGameServer(buffer.ToArray());
 
 			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
