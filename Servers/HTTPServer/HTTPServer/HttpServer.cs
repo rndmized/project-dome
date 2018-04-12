@@ -20,7 +20,7 @@ namespace TCPServer
 	{
 		public static void Main(string[] args)
 		{
-			HttpServer a = new HttpServer(8081);
+			HttpServer a = new HttpServer(8080);
 			a.Run();
 		}
 	}
@@ -183,6 +183,7 @@ namespace TCPServer
 		{
 			List<byte> data = new List<byte>();
 			data.Add((int)EnumsServer.Enums.AllEnums.HListPlayers);
+			data.AddRange(BitConverter.GetBytes(Encoding.ASCII.GetBytes(token).Length));
 			data.AddRange(Encoding.ASCII.GetBytes(token));
 			
 			SendToGameServer(data.ToArray());
@@ -235,8 +236,8 @@ namespace TCPServer
 			KickPlayerJson p = JsonConvert.DeserializeObject<KickPlayerJson>(json);
 
 			ByteBuffer buffer = new ByteBuffer();
-			buffer.WriteByte((int)EnumsServer.Enums.AllEnums.HKickPlayer); //*******TEMP********* change the ID later
-			buffer.WriteString(p.json_token); //*******TEMP********* Deserialize json first
+			buffer.WriteByte((int)EnumsServer.Enums.AllEnums.HKickPlayer); 
+			buffer.WriteString(token); 
 			buffer.WriteString(p.player_ID);
 			buffer.WriteString(p.char_ID);
 			SendToGameServer(buffer.ToArray());
@@ -288,7 +289,7 @@ namespace TCPServer
 				p.char_name = buffer.ReadString();
 				p.player_ip = buffer.ReadString();
 				p.current_playtime = buffer.ReadInt();
-				p.total_playtime = buffer.ReadInt();
+				//p.total_playtime = buffer.ReadInt();
 
 				players.Add(p);
 			}
@@ -302,6 +303,7 @@ namespace TCPServer
 
 			response.Response.ContentLength64 = buffer.Length;
 			response.Response.StatusCode = httpcode;
+			response.Response.AddHeader("Access-Control-Allow-Origin","*");
 
 			var output = response.Response.OutputStream;
 			output.Write(buffer, 0, buffer.Length);

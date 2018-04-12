@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using ByteBufferDLL;
 using System;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 //using UnityEditor.Animations;
 
 public class Network : MonoBehaviour
@@ -43,23 +44,29 @@ public class Network : MonoBehaviour
 		{
 			myStream = client.GetStream();
 			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteInt((int)Assets.Scripts.Enums.AllEnums.SSendingPlayerID);
 			buffer.WriteString(PlayerProfile.token);
 			buffer.WriteString(PlayerProfile.uID);
 			buffer.WriteString(PlayerProfile.cID);
 			buffer.WriteInt(PlayerProfile.characterInfo.char_hairId);
 			buffer.WriteInt(PlayerProfile.characterInfo.char_bodyId);
 			buffer.WriteInt(PlayerProfile.characterInfo.char_clothesId);
+			myStream.Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 		}
 	}
 	private void OnGUI()
 	{
-		GUILayout.Label(msg);
+		//GUILayout.Label(msg);
 	}
 	
 
 	// Update is called once per frame
 	void Update()
 	{
+		if (!client.Connected)
+		{
+			SceneManager.LoadScene(0);
+		}
 		if (myStream.DataAvailable)
 		{
 			myStream.Read(inBuffer, 0, buffersize);
@@ -73,10 +80,9 @@ public class Network : MonoBehaviour
 			HandleMessages(packetnum, buffer.ToArray());
 		}
 
-		if (frameCounter == 60)
+		if (frameCounter == 15)
 		{
 			frameCounter = 0;
-			//msg = "X: " + mainPlayer.transform.position.x + " Y: " + mainPlayer.transform.position.y + " Z: " + mainPlayer.transform.position.z;
 			SendMovement(PlayerProfile.uID, mPlayer.transform.position.x, mPlayer.transform.position.y, mPlayer.transform.position.z);
 		}
 		frameCounter++;
@@ -106,6 +112,7 @@ public class Network : MonoBehaviour
 		ByteBuffer buffer = new ByteBuffer();
 		buffer.WriteBytes(data);
 		buffer.ReadInt();
+		if (isMainPlayer) buffer.ReadString();
 		String uName = buffer.ReadString();
 		String cName = buffer.ReadString();
 		int hair = buffer.ReadInt();
@@ -123,7 +130,7 @@ public class Network : MonoBehaviour
 		buffer.WriteBytes(data); // contains playerID, X,Y,Z in this other
 		buffer.ReadInt();
 		string playerID = buffer.ReadString();
-		Debug.Log("*********entrou******"+playerID);
+		//Debug.Log("*********entrou******"+playerID);
 		float x, y, z = 0;
 		x = buffer.ReadFloat();
 		y = buffer.ReadFloat();
@@ -171,7 +178,7 @@ public class Network : MonoBehaviour
 				{
 					PlayerProfile.uID = uName;
 					mainPlayer.GetComponent<CharacterRenderer>().character = NPC_Char;
-					mPlayer = Instantiate(mainPlayer, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
+					mPlayer = Instantiate(mainPlayer, spawnPoint.transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
                     mPlayer.name = PlayerProfile.uID;
                     Camera.main.GetComponent<CameraController>().character = mPlayer.transform;
 					break;
@@ -181,7 +188,7 @@ public class Network : MonoBehaviour
 					
 					msg = uName;
 					NPC.GetComponent<CharacterRenderer>().character = NPC_Char;
-					GameObject nPlayer = Instantiate(NPC, transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
+					GameObject nPlayer = Instantiate(NPC, spawnPoint.transform.TransformPoint(0, 0, 0), new Quaternion(0, 0, 0, 0));
                     nPlayer.name = uName;
                     tst.Add(uName, nPlayer);
                     break;

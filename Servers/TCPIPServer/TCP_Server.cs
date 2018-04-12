@@ -24,30 +24,8 @@ namespace ServerEcho
 		public static bool mainRun = true;
 		public static bool threadsRun = true;
 
-		private static Player[] p = new Player[3];
-		public static void FeedDataToArray()
-		{
-			p[2] = new Player();
-			p[2].cName = "ubaduba";
-			p[2].uName = "Player1";
-			p[2].head = 4;
-			p[2].body = 0;
-			p[2].cloths = 4;
-
-			p[1] = new Player();
-			p[1].cName = "sfsadfsafd";
-			p[1].uName = "Player2";
-			p[1].head = 3;
-			p[1].body = 0;
-			p[1].cloths = 3;
-		}
-
-		public static Player GetPlayer()
-		{
-			i++;
-			return p[i];
-		}
-
+		//private static Player[] p = new Player[3];
+	
 		public static void ChangeNoOfPlayers(int n)
 		{
 			clients = new TcpClient[n];
@@ -64,8 +42,7 @@ namespace ServerEcho
 		private bool run = true;
 		TcpListener serverSocket;
 		TcpListener httpSocket;
-		int counter = 0;
-
+		
 		public TCP_Server(string path)
 		{
 			this.path = path;
@@ -91,7 +68,6 @@ namespace ServerEcho
 
 		static void Main(string[] args)
 		{
-			Globals.FeedDataToArray();
 			TCP_Server tcp = new TCP_Server("D://config.txt");
 			tcp.Start();
 			
@@ -194,6 +170,7 @@ namespace ServerEcho
 			this.clNo = clineNo;
 			Thread ctThread = new Thread(doClient);
 			ctThread.Start();
+			this.ip = ip;
 		}
 
 		private void doClient() 
@@ -211,8 +188,16 @@ namespace ServerEcho
 
 			networkStream.Read(bytesFrom, 0, 4096);
 			buffer.WriteBytes(bytesFrom);
+			buffer.ReadInt();
+			string token = buffer.ReadString();
+			if (!JwtTokens.EvaluateToken(token))
+			{
+				byte[] bufferE = new byte[4];
+				bufferE[0] = (byte)Enums.AllEnums.SInvalid;
+				networkStream.Write(bufferE, 0, 4);
+				return;
+			}
 
-			JwtTokens.EvaluateToken(buffer.ReadString());
 			Player pl = new Player();
 			pl.uName = buffer.ReadString();
 			pl.cName = buffer.ReadString();
@@ -220,42 +205,15 @@ namespace ServerEcho
 			pl.body = buffer.ReadInt();
 			pl.cloths = buffer.ReadInt();
 			pl.currentPlaytime = DateTime.Now;
-			pl.totalPlaytime = buffer.ReadInt();
+			pl.playerIP = ip;
+			//pl.totalPlaytime = buffer.ReadInt();
 			pl.socketID = clNo;
 			
 			Globals.dicPlayers.Add(clNo, pl);
 
-			
-
-			//IF YOU WANT TO TEST WITH THE TEST SCENE, USE THIS CODE
-			/*ByteBuffer buffer = new ByteBuffer();
-			//buffer.WriteInt(0);
-			buffer.WriteInt((int)Enums.AllEnums.SSendingPlayerID);
-			//buffer.WriteInt(clNo);
-
-			Player pl = Globals.GetPlayer();
-			Globals.dicPlayers.Add(clNo, pl); 
-			buffer.WriteString(pl.uName);
-			buffer.WriteString(pl.cName);
-			buffer.WriteInt(pl.head);
-			buffer.WriteInt(pl.body);
-			buffer.WriteInt(pl.cloths);*/
-
-			/*byte[] size = BitConverter.GetBytes(buffer.Size());
-			byte[] aux = buffer.ToArray();
-
-			aux[0] = size[0];
-			aux[1] = size[1];
-			aux[2] = size[2];
-			aux[3] = size[3];
-
-			/*Console.WriteLine(buffer.Size());
-			Console.WriteLine(buffer.ToArray().Length);*/
-			//networkStream = clientSocket.GetStream();
-
 			Globals.clients[clNo].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 			networkStream.Flush();
-			Console.WriteLine(buffer.ToArray().Length+" to "+clNo);
+			
 
 			NotifyAlreadyConnected(clNo, pl);
 			NotifyMainPlayerOfAlreadyConnected(clNo);
@@ -274,7 +232,7 @@ namespace ServerEcho
 						networkStream.Read(bytesFrom, 0, 4096);
 						buffer.WriteBytes(bytesFrom);
 
-						buffer.ReadInt(); // ignoring package size
+						//buffer.ReadInt(); // ignoring package size
 						int packageID = buffer.ReadInt();
 
 						if (packageID == (int)Enums.AllEnums.SCloseConnection)
@@ -293,7 +251,9 @@ namespace ServerEcho
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine(" >> " + ex.ToString());
+					Console.WriteLine(">> Closing connection from player " + Globals.dicPlayers[clNo].uName);
+					Globals.dicPlayers.Remove(clNo);
+					run = false;
 				}
 			}
 
@@ -306,6 +266,7 @@ namespace ServerEcho
 			{
 				case (int)Enums.AllEnums.SSyncingPlayerMovement:
 					{
+						//Console.WriteLine("received sync from "+id);
 						SendToAllBut(id, data);
 						break;
 					}
@@ -344,15 +305,9 @@ namespace ServerEcho
 						buffer.WriteInt(Globals.dicPlayers[i].head);
 						buffer.WriteInt(Globals.dicPlayers[i].body);
 						buffer.WriteInt(Globals.dicPlayers[i].cloths);
-
-						/*byte[] size = BitConverter.GetBytes(buffer.Size());
-						byte[] aux = buffer.ToArray();
-
-						aux[0] = size[0];
-						aux[1] = size[1];
-						aux[2] = size[2];
-						aux[3] = size[3];*/
-
+						buffer.WriteFloat(Globals.dicPlayers[i].cX);
+						buffer.WriteFloat(Globals.dicPlayers[i].cY);
+						buffer.WriteFloat(Globals.dicPlayers[i].cZ);
 						//Thread.Sleep(1500); //If the thread doesnt sleep, the packet is not sent
 
 						Console.WriteLine(buffer.ToArray().Length);
@@ -380,14 +335,6 @@ namespace ServerEcho
 			buffer.WriteInt(p.head);
 			buffer.WriteInt(p.body);
 			buffer.WriteInt(p.cloths);
-
-			/*byte[] size = BitConverter.GetBytes(buffer.Size());
-			byte[] aux = buffer.ToArray();
-
-			aux[0] = size[0];
-			aux[1] = size[1];
-			aux[2] = size[2];
-			aux[3] = size[3];*/
 
 			for (int i = 0; i < 20; i++)
 			{
@@ -475,7 +422,6 @@ namespace ServerEcho
 
 		public static bool EvaluateToken(string text)
 		{
-			return true;
 			try
 			{
 				Jose.JWT.Decode(text, Encoding.ASCII.GetBytes(key));
@@ -669,7 +615,8 @@ namespace ServerEcho
 		{
 			ByteBuffer buffer = new ByteBuffer();
 			buffer.WriteBytes(data);
-
+			buffer.ReadByte();
+			buffer.ReadString();
 			string playerid = buffer.ReadString();
 			for (int i = 0; i < Globals.dicPlayers.Count; i++)
 			{
@@ -685,7 +632,7 @@ namespace ServerEcho
 				}
 			}
 
-			
+			SendDefaultRespose(true);
 		}
 		
 		/// <summary>
@@ -695,7 +642,8 @@ namespace ServerEcho
 		{
 			ByteBuffer buffer = new ByteBuffer();
 			TimeSpan aux = new TimeSpan();
-			
+
+			buffer.WriteInt(Globals.dicPlayers.Count);
 			foreach (Player p in Globals.dicPlayers.Values)
 			{
 				buffer.WriteString(p.uName);
@@ -703,7 +651,7 @@ namespace ServerEcho
 				buffer.WriteString(p.playerIP);
 				aux = DateTime.Now - p.currentPlaytime;
 				buffer.WriteInt(aux.Hours*60+aux.Minutes); 
-				buffer.WriteInt(p.totalPlaytime+(aux.Hours * 60 + aux.Minutes));
+				//buffer.WriteInt(p.totalPlaytime+(aux.Hours * 60 + aux.Minutes));
 			}
 
 			Globals.httpClient[clNo].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
@@ -720,6 +668,8 @@ namespace ServerEcho
 			TcpClient client = new TcpClient();
 			client.Connect("", Globals.port);
 			client.Close();
+
+			SendDefaultRespose(true);
 		}
 
 		private void SendDefaultRespose(bool success)
@@ -727,6 +677,13 @@ namespace ServerEcho
 			byte[] buffer = new byte[1];
 			buffer = BitConverter.GetBytes(success);
 			Globals.httpClient[clNo].GetStream().Write(buffer, 0, buffer.Length);
+		}
+
+		private static void SendDefaultRespose(bool success, int id)
+		{
+			byte[] buffer = new byte[1];
+			buffer = BitConverter.GetBytes(success);
+			Globals.httpClient[id].GetStream().Write(buffer, 0, buffer.Length);
 		}
 
 		//UPDATE DB
@@ -737,9 +694,11 @@ namespace ServerEcho
 			buffer.WriteString(Globals.dicPlayers[id].uName);
 
 			HandleClinet.SendToAllBut(id, buffer.ToArray());
-			Globals.dicPlayers.Remove(id);
+			//Globals.dicPlayers.Remove(id);
 			Globals.clients[id].Client.Close();
 			Globals.clients[id] = null;
+
+			SendDefaultRespose(true, id);
 			//Update player playtime
 		}
 	}

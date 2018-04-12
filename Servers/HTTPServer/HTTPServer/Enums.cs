@@ -14,9 +14,7 @@ namespace EnumsServer
 			SSendingMainToAlreadyConnected = 3,
 			SSyncingPlayerMovement = 4,
 			SSendingMessage = 5,
-			SSendingMessageWorld = 6,
-			SCloseConnection = 7,
-			SInvalid = 8,
+			SCloseConnection = 6,
 
 			HListPlayers = 10,
 			HKickPlayer = 11,

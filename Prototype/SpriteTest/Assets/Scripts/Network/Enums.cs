@@ -13,8 +13,11 @@ namespace Assets.Scripts
 				SSendingAlreadyConnectedToMain = 2,
 				SSendingMainToAlreadyConnected = 3,
 				SSyncingPlayerMovement = 4,
-				SSendingMessage = 5
+				SSendingMessage = 5,
+				SSendingMessageWorld = 6,
+				SCloseConnection = 7
 			}
+		
 		}
 	}
 
