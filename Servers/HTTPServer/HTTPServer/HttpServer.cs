@@ -31,7 +31,7 @@ namespace TCPServer
 		public HttpServer(int port)
 		{
 			httpListener = new HttpListener();
-			httpListener.Prefixes.Add("http://localhost:" + port + "/");
+			httpListener.Prefixes.Add("http://127.0.0.1:" + port + "/");
 
 			client.Connect("", 5000);
 		}
@@ -45,8 +45,13 @@ namespace TCPServer
 			while (true)
 			{
 				var context = httpListener.GetContext(); // The contexts(request) has a field rawUrl and httpMethod that encapsulates the url and method(post,get...)
-				string token = context.Request.Headers.GetValues("token")[0];
-
+				if (context.Request.HttpMethod == "OPTIONS")
+				{
+					SendToClient(context, "", 200, true);
+					continue;
+				}
+				string token = context.Request.Headers["authorization"];
+				
 				if (true) //validate token
 				{
 					switch (context.Request.HttpMethod)
@@ -66,17 +71,7 @@ namespace TCPServer
 				}
 				else
 				{
-					//var response = context.Response;
-					const string json = "{ error: \"Authentication failed\"}";
-					SendToClient(context, json, 401);
-					/*byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-					context.Response.ContentLength64 = buffer.Length;
-					context.Response.StatusCode = 403;
-					Stream output = context.Response.OutputStream;
-					output.Write(buffer, 0, buffer.Length);
-					Console.WriteLine(output);
-					output.Close();
-					//Console.ReadKey();*/
+					SendToClient(context, "{ error: \"Authentication failed\"}", 404);
 				}
 			}
 
@@ -220,9 +215,9 @@ namespace TCPServer
 			ByteBuffer bf = new ByteBuffer();
 			bf.WriteBytes(dataFromServer);
 
-			string json = "{ port:" + bf.ReadInt() + ", concurrent_players: " + bf.ReadInt() + "}";
+			string json = "{\"port\":" + bf.ReadInt() + ", \"concurrent_players\":" + bf.ReadInt() + "}";
 
-			SendToClient(response, json, 200);
+			SendToClient(response, json, 200,true);
 			
 		}
 
@@ -297,19 +292,22 @@ namespace TCPServer
 			return JsonConvert.SerializeObject(players);
 		}
 
-		private void SendToClient(HttpListenerContext response,string json,int httpcode)
+		private void SendToClient(HttpListenerContext response, string json, int httpcode)
 		{
 			byte[] buffer = Encoding.UTF8.GetBytes(json);
 
 			response.Response.ContentLength64 = buffer.Length;
 			response.Response.StatusCode = httpcode;
-			response.Response.AddHeader("Access-Control-Allow-Origin","*");
-
+			response.Response.AddHeader("Content-Type", "application/json");
+			response.Response.ContentType = "application/json";
+			response.Response.AddHeader("Access-Control-Allow-Origin", "*");
+			response.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, authorization");
+			response.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST");
+			response.Response.ContentType = "application/json";
 			var output = response.Response.OutputStream;
 			output.Write(buffer, 0, buffer.Length);
 			output.Flush();
 		}
-
 	}
 
 	class PlayerJson
