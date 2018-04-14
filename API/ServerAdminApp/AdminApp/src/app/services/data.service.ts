@@ -41,13 +41,12 @@ export class DataService {
   /**************************************** */
   /** Resturn a list of Online Players */
   listPlayers(): Observable < any > {
-    let headers = new Headers({
-      'Authorization': 'Bearer ' + this.authenticationService.token
-    });
+    let headers = new Headers();
+    headers.append( 'Authorization', this.authenticationService.token);
     let options = new RequestOptions({
       headers: headers
     });
-    return this.http.post(this.gameServerURL + 'listPlayers', options)
+    return this.http.get(this.gameServerURL + 'listPlayers', options)
       .map((response: Response) => {
         let res = response.json();
         let onlinePlayers = [];
@@ -60,11 +59,16 @@ export class DataService {
 
   /** Kick a given player from game server */
   kickPlayer(player_ID: string, char_ID: string): Observable < boolean > {
-    return this.http.post(this.gameServerURL + 'kick', {
+    let headers = new Headers();
+    headers.append( 'Authorization', this.authenticationService.token);
+    let options = new RequestOptions({
+      headers: headers
+    });
+    return this.http.post(this.gameServerURL + 'kickPlayer', {
         player_ID: player_ID,
         char_ID: char_ID,
         token: this.authenticationService.token
-      })
+      },options)
       .map((response: Response) => {
         let res = response.json();
         if (res.success) {

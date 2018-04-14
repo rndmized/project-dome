@@ -1,0 +1,10 @@
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\obj\Debug\HTTPServer.pdb
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\obj\Debug\HTTPServer.csproj.CoreCompileInputs.cache
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\bin\Debug\HTTPServer.exe
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\bin\Debug\HTTPServer.pdb
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\bin\Debug\ByteBufferDLL.dll
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\bin\Debug\ByteBufferDLL.pdb
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\obj\Debug\HTTPServer.exe
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\HTTPServer\HTTPServer\obj\Debug\HTTPServer.csprojResolveAssemblyReference.cache

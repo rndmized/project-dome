@@ -26,3 +26,11 @@ C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\TCPSer
 C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\TCPServer\bin\Debug\System.IdentityModel.Tokens.Jwt.xml
 C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\TCPServer\obj\Debug\TCPServer.exe
 C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\TCPServer\TCPServer\obj\Debug\TCPServer.pdb
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\bin\Debug\TCPServer.exe.config
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\bin\Debug\TCPServer.exe
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\bin\Debug\TCPServer.pdb
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\bin\Debug\System.Runtime.InteropServices.RuntimeInformation.dll
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\obj\Debug\TCPServer.csproj.CoreCompileInputs.cache
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\obj\Debug\TCPServer.exe
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\obj\Debug\TCPServer.pdb
+C:\Users\Pedro\Desktop\GitGMIT\project-dome\Servers\TCPIPServer\obj\Debug\TCPServer.csprojResolveAssemblyReference.cache

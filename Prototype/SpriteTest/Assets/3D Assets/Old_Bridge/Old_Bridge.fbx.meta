@@ -4,8 +4,20 @@ timeCreated: 18446744011573954816
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
+    100000: //RootNode
+    400000: //RootNode
+    2300000: //RootNode
+    3300000: //RootNode
     4300000: Box018
-  externalObjects: {}
+    6400000: //RootNode
+    7400000: Default Take
+    11100000: //RootNode
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Q__old_bridge_png
+    second: {fileID: 2100000, guid: 661aa56010590f54f98655051f868e48, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

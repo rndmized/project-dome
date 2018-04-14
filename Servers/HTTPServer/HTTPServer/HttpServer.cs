@@ -47,11 +47,10 @@ namespace TCPServer
 				var context = httpListener.GetContext(); // The contexts(request) has a field rawUrl and httpMethod that encapsulates the url and method(post,get...)
 				if (context.Request.HttpMethod == "OPTIONS")
 				{
-					SendToClient(context, "", 200, true);
+					SendToClient(context, "", 200);
 					continue;
 				}
 				string token = context.Request.Headers["authorization"];
-				
 				if (true) //validate token
 				{
 					switch (context.Request.HttpMethod)
@@ -217,7 +216,7 @@ namespace TCPServer
 
 			string json = "{\"port\":" + bf.ReadInt() + ", \"concurrent_players\":" + bf.ReadInt() + "}";
 
-			SendToClient(response, json, 200,true);
+			SendToClient(response, json, 200);
 			
 		}
 
@@ -240,7 +239,10 @@ namespace TCPServer
 			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
 
 			byte aux = (byte)client.GetStream().ReadByte();
-			json = "{ success : " + Convert.ToBoolean(data) + " }";
+			if(aux == 1)	
+				json = "{ \"success\" : true }";
+			else
+				json = "{ \"success\" : false }";
 
 			SendToClient(response, json, 200);
 

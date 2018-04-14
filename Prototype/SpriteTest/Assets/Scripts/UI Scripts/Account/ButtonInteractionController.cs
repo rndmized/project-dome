@@ -14,7 +14,7 @@ public class ButtonInteractionController : MonoBehaviour {
     {
         PlayerProfile.cID = this.transform.parent.GetComponent<CharacterElementDisplay>().charName.text;
         PlayerProfile.characterInfo = this.transform.parent.GetComponent<CharacterElementDisplay>().charInfo;
-        SceneManager.LoadScene("Test1");
+        SceneManager.LoadScene("GameScene-UndergroundCity");
     }
 
     /// <summary>

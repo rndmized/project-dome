@@ -643,6 +643,12 @@ namespace ServerEcho
 			ByteBuffer buffer = new ByteBuffer();
 			TimeSpan aux = new TimeSpan();
 
+			if (Globals.dicPlayers.Count == 0)
+			{
+				buffer.WriteByte(1);
+				Globals.httpClient[clNo].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
+				return;
+			}
 			buffer.WriteInt(Globals.dicPlayers.Count);
 			foreach (Player p in Globals.dicPlayers.Values)
 			{
