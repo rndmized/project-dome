@@ -308,13 +308,12 @@ namespace ServerEcho
 						buffer.WriteFloat(Globals.dicPlayers[i].cX);
 						buffer.WriteFloat(Globals.dicPlayers[i].cY);
 						buffer.WriteFloat(Globals.dicPlayers[i].cZ);
-						//Thread.Sleep(1500); //If the thread doesnt sleep, the packet is not sent
-
-						Console.WriteLine(buffer.ToArray().Length);
+						Thread.Sleep(1000); //If the thread doesnt sleep, the packet is not sent
+						//Console.WriteLine(buffer.ToArray().Length+" to "+id);
 
 						Globals.clients[id].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 						//Globals.clients[id].GetStream().Flush();
-						Console.WriteLine("Sending sync to "+id);
+						//Console.WriteLine("Sending sync to "+id);
 					}
 				}
 			}
@@ -325,7 +324,7 @@ namespace ServerEcho
 		/// </summary>
 		/// <param name="id"></param>
 		/// <param name="p"></param>
-		static void NotifyAlreadyConnected(int id, Player p) // sends current player to already connected player 
+		static void NotifyAlreadyConnected(int id, Player p)  
 		{
 			ByteBuffer buffer = new ByteBuffer();
 
@@ -338,11 +337,10 @@ namespace ServerEcho
 
 			for (int i = 0; i < 20; i++)
 			{
-				if (Globals.clients[i] != null && Globals.clients[i].Connected)
+				if (Globals.clients[i] != null && Globals.clients[i].Connected) // sends current player to already connected player 
 				{
 					if (i != id)
 					{
-						
 						Globals.clients[i].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 						Globals.clients[i].GetStream().Flush();
 					}

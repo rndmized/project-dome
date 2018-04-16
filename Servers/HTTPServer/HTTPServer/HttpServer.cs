@@ -102,13 +102,6 @@ namespace TCPServer
 					{
 						string json = "{ error: \"Not found\"}";
 						SendToClient(response, json, 404);
-						/*var buffer = Encoding.UTF8.GetBytes(json);
-						response.Response.ContentLength64 = buffer.Length;
-						response.Response.StatusCode = 404;
-						var output = response.Response.OutputStream;
-						output.Write(buffer, 0, buffer.Length);
-						output.Flush();
-						output.Close();*/
 						break;
 					}
 			}
@@ -132,13 +125,7 @@ namespace TCPServer
 					}
 				default:
 					{
-						string json = "{ error: \"Not found\"}";
-						SendToClient(response, json, 404);
-						/*var buffer = Encoding.UTF8.GetBytes(json);
-						var output = response.Response.OutputStream;
-						output.Write(buffer, 0, buffer.Length);
-						output.Flush();
-						output.Close();*/
+						SendToClient(response, "{ error: \"Not found\"}", 404);
 						break;
 					}
 			}
@@ -252,7 +239,7 @@ namespace TCPServer
 		private void RestartServer(HttpListenerContext response, string token)
 		{
 			List<byte> buffer = new List<byte>();
-			buffer.Add((int)EnumsServer.Enums.AllEnums.HRestartServer); //Mudar
+			buffer.Add((int)EnumsServer.Enums.AllEnums.HRestartServer); //Same as writting a short
 			buffer.AddRange(BitConverter.GetBytes(Encoding.ASCII.GetBytes(token).Length));
 			buffer.AddRange(Encoding.ASCII.GetBytes(token));
 
@@ -284,7 +271,7 @@ namespace TCPServer
 				PlayerJson p = new PlayerJson();
 				p.username = buffer.ReadString();
 				p.char_name = buffer.ReadString();
-				p.player_ip = buffer.ReadString();
+				p.player_IP = buffer.ReadString();
 				p.current_playtime = buffer.ReadInt();
 				//p.total_playtime = buffer.ReadInt();
 
@@ -316,7 +303,7 @@ namespace TCPServer
 	{
 		public string username { get; set; }
 		public string char_name { get; set; }
-		public string player_ip { get; set; }
+		public string player_IP { get; set; }
 		public int current_playtime { get; set; }
 		public int total_playtime { get; set; }
 	}
@@ -329,7 +316,6 @@ namespace TCPServer
 
 	class KickPlayerJson
 	{
-		public string json_token { get; set; }
 		public string player_ID { get; set; }
 		public string char_ID { get; set; }
 	}
