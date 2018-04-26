@@ -169,11 +169,12 @@ namespace TCPServer
 			
 			SendToGameServer(data.ToArray());
 
+			response:
 			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
 
 			byte[] dataFromServer = new byte[4096];
 			client.GetStream().Read(dataFromServer, 0, dataFromServer.Length);
-
+			if (dataFromServer[0] == 1 && dataFromServer[4]==0) goto response;
 			string json = ConvertToJson(dataFromServer);
 
 			SendToClient(response,json,200);

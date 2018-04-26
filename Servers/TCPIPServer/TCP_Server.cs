@@ -94,6 +94,7 @@ namespace ServerEcho
 						HandleHttpClient httpClient = new HandleHttpClient();
 						httpClient.StartHttpClient(Globals.httpClient[i],i);
 					}
+					Thread.Sleep(1000);
 				}
 			});
 
@@ -251,8 +252,9 @@ namespace ServerEcho
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine(">> Closing connection from player " + Globals.dicPlayers[clNo].uName);
-					Globals.dicPlayers.Remove(clNo);
+					//Console.WriteLine(">> Closing connection from player " + Globals.dicPlayers[clNo].uName);
+					//Globals.clients[clNo] = null;
+					//Globals.dicPlayers.Remove(clNo);
 					run = false;
 				}
 			}
@@ -310,7 +312,6 @@ namespace ServerEcho
 						buffer.WriteFloat(Globals.dicPlayers[i].cZ);
 						Thread.Sleep(1000); //If the thread doesnt sleep, the packet is not sent
 						//Console.WriteLine(buffer.ToArray().Length+" to "+id);
-
 						Globals.clients[id].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 						//Globals.clients[id].GetStream().Flush();
 						//Console.WriteLine("Sending sync to "+id);
@@ -624,8 +625,8 @@ namespace ServerEcho
 					//update index
 					CloseConnection(i);
 					/*Globals.clients[i].Close();
-					Globals.clients[i] = null;
-					Globals.i = i;*/
+					Globals.clients[i] = null;*/
+					//Globals.i = i
 					break;
 				}
 			}
@@ -643,13 +644,14 @@ namespace ServerEcho
 
 			if (Globals.dicPlayers.Count == 0)
 			{
-				buffer.WriteByte(1);
+				buffer.WriteByte(0);
 				Globals.httpClient[clNo].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 				return;
 			}
 			buffer.WriteInt(Globals.dicPlayers.Count);
 			foreach (Player p in Globals.dicPlayers.Values)
 			{
+				Console.WriteLine(">>> List players: "+ p.uName);
 				buffer.WriteString(p.uName);
 				buffer.WriteString(p.cName);
 				buffer.WriteString(p.playerIP);
@@ -657,7 +659,7 @@ namespace ServerEcho
 				buffer.WriteInt(aux.Hours*60+aux.Minutes); 
 				//buffer.WriteInt(p.totalPlaytime+(aux.Hours * 60 + aux.Minutes));
 			}
-
+			Console.WriteLine("\n");
 			Globals.httpClient[clNo].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
 		}
 
@@ -701,7 +703,8 @@ namespace ServerEcho
 			//Globals.dicPlayers.Remove(id);
 			Globals.clients[id].Client.Close();
 			Globals.clients[id] = null;
-
+			Console.WriteLine(">> Closing connection from player " + Globals.dicPlayers[id].uName);
+			Globals.dicPlayers.Remove(id);
 			SendDefaultRespose(true, id);
 			//Update player playtime
 		}
