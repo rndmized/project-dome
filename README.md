@@ -8,9 +8,20 @@ Repo for 4th Year Final Year Project - MMORPG/Adventure Game powered by Unity, w
 
 ## Introduction
 
-With this project we created a MMO game along tools to manage the player community. We divided the system into smaller micro services such as a Login Server (Node), a Game Server (dotNet) and a management app (Angular 5), as well as the Game Client itself (Unity). All of which can be scaled to allow more users to play the game and provide a better flow for the application, so users in the game server are not affected with issues with the login server being overloaded with requests and similiar situations.
+As software developers and video game enthusiasts, we wanted to try and develop a video game. However the time constrains, the lack of a larger team, along the low budget would not allow us to develop a fully featured
+game, so we decided to explore other alternatives that would keep us working on our interest while developing a functional piece of software. In doing so, we came across a myriad of dierent concepts and ideas, and nally
+decided on what it would become Project Dome. The initial plan was to build a multiplayer game, that conveyed a story of thinking outside the imposed bounds of society, with two very differentiated factions, and a set of
+simple mechanics that would constitute the game loop. Even though it was a very interesting idea, it soon became clear that the focus of such project had too little programming and a lot of story boarding, and lore
+creating. After discarding the idea, we shifted our focus from a fully 
+edged game to something else. Not only a game, but an infrastructure built around the game composed of services that would support it. In one thing
+though, we kept from changing, the art style. We decided to implement a minimal game client, that would make use of 2D characters in 3D environments and that we maintained.
 
-[TODO: Screenshots]
+Project Dome is full-scale project, involving a Game Client, aWeb Application and a set of server and APIs. The Game implementation is a massive multiplayer online adventure supported by a log in server, that authenticates users, a game server where players connect to and synchronizes all game clients, a http server that interfaces with the game server and allows our web application to extract information and change server settings as well as monitor the game community. All the applications that compose the solution have been built from the ground up, and furthermore, allow the system to change as well as to scale with relative ease.
+
+<p align="center">
+<img src="https://github.com/rndmized/project-dome/blob/master/docs/images/logIn-Scene.png" width="250"><img src="https://github.com/rndmized/project-dome/blob/master/docs/images/gameScene.png" width="250">
+
+</p>
 
 ## Architecture
 
@@ -23,7 +34,11 @@ Once the character has been selected and the player clicks **play**, the game se
 The **management app** allows **Administrators** to **log in**, connecting again to the **LogIn Server**, and will retrive relevant information for the administrator as well as allow them to perform certain options which include: **Ban**, **Pardon** or **Kick** a player from the server. Change **game server port**, the **maximum** number of *concurrent users* or even **restart** the server. It also can query the **game server** to retrieve information about connected players such as current playtime, total playtime, IP, character's name and player's name.
 
 
-[TODO: DIagram here.]
+<p align="center">
+<img src="https://github.com/rndmized/project-dome/blob/master/docs/images/SystemArchitecture.png" width="350">
+</p>
+
+
 
 ## Deployment
 
