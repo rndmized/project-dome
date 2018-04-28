@@ -10,12 +10,12 @@ public static  class PlayerProfile {
     /// <summary>
     /// Login Server Address.
     /// </summary>
-    private static string loginServerAddress = "http://34.247.11.72:3000/";
+    private static string loginServerAddress = "http://localhost:3000/";
     
     /// <summary>
     /// Game Server Address.
     /// </summary>
-    private static string gameServerAddress = "http://34.247.11.72:5500/";
+    private static string gameServerAddress = "http://localhost:5500/";
 
     /// <summary>
     /// Character Data for selected Character to be sent to the game server.
