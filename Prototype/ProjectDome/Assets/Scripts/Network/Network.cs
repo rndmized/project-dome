@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class Network : MonoBehaviour
 {
 	TcpClient client = new TcpClient();
-	const string ip = "127.0.0.1";
+	private string ip = PlayerProfile.GetGameServerAddress();
 	const int port = 5500;
 	const int buffersize = 4096;
 	public NetworkStream myStream;
@@ -104,7 +104,10 @@ public class Network : MonoBehaviour
 			case (int)Assets.Scripts.Enums.AllEnums.SSyncingPlayerMovement:
 				HandleSSyncingPlayerMovement(data);
 				break;
-		}
+            case (int)Assets.Scripts.Enums.AllEnums.SCloseConnection:
+                CloseConnection(data);
+                break;
+        }
 	}
 
 	private void HandlePlayerPackage(byte[] data, bool isMainPlayer)
@@ -195,5 +198,19 @@ public class Network : MonoBehaviour
 				}
 		}
 	}
+
+    private void CloseConnection(byte[] data)
+    {
+        ByteBuffer buffer = new ByteBuffer();
+        buffer.WriteBytes(data);
+        buffer.ReadInt();
+        String id = buffer.ReadString();
+        Destroy(tst[id]);
+    }
+
+    private void OnApplicationQuit()
+    {
+        client.Close();
+    }
 
 }
