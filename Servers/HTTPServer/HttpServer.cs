@@ -1,306 +1,329 @@
-﻿using System;
-using System.Threading;
+﻿using ByteBufferDLL;
+using Newtonsoft.Json;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using ByteBufferDLL;
-using EnumsServer;
-using System.Net;
-using System.Collections;
-using System.IO;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace ServerEcho
+namespace TCPServer
 {
-	class Globals
+
+	class Maain
 	{
-		public static TcpClient[] clients = new TcpClient[20];
-	}
-	class Server2
-	{
-		static void Main(string[] args)
+		public static void Main(string[] args)
 		{
-			TcpListener serverSocket = new TcpListener(IPAddress.Any,5500);
-			TcpClient clientSocket = default(TcpClient);
-			HttpListener http = new HttpListener();
-			http.
-			int counter = 0;
-
-			serverSocket.Start();
-			Console.WriteLine(" >> " + "Echo Server 2 Started");
-
-			while (true)
-			{
-				for (int i = 0; i < 20; i++)
-				{
-					if (Globals.clients[i] == null)
-					{
-						Globals.clients[i] = new TcpClient();
-						Globals.clients[i] = serverSocket.AcceptTcpClient();
-						Console.WriteLine(" >> " + "Client No:" + Convert.ToString(counter) + " started! " + Globals.clients[i].Client.LocalEndPoint);
-						handleClinet client = new handleClinet();
-						client.startClient(Globals.clients[i], counter);
-						counter++;
-					}
-				}
-
-			}
-
-			clientSocket.Close();
-			serverSocket.Stop();
-			Console.WriteLine(" >> " + "exit");
-			Console.ReadLine();
+			HttpServer a = new HttpServer(8080);
+			a.Run();
 		}
 	}
-
-	public class handleClinet
-	{
-		TcpClient clientSocket;
-		int clNo;
-		int count = 1;
-		public void startClient(TcpClient inClientSocket, int clineNo)
-		{
-			this.clientSocket = inClientSocket;
-			this.clNo = clineNo;
-			Thread ctThread = new Thread(doClient);
-			ctThread.Start();
-		}
-		private void doClient()
-		{
-			int requestCount = 0;
-			byte[] bytesFrom = new byte[10025];
-			string dataFromClient = null;
-			Byte[] sendBytes = null;
-			string serverResponse = null;
-			string rCount = null;
-			requestCount = 0;
-			NetworkStream networkStream;
-			
-			ByteBuffer buffer = new ByteBuffer();
-			buffer.WriteInt((int)Enums.AllEnums.SSendingPlayerID);
-			buffer.WriteInt(clNo);
-			networkStream = clientSocket.GetStream();
-			networkStream.Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-			//networkStream.Flush();
-			NotifyAlreadyConnected(clNo);
-			NotifyMainPlayerOfAlreadyConnected(clNo);
-
-			count++;
-			while ((true))
-			{
-				try
-				{
-					requestCount = requestCount + 1;
-					networkStream = clientSocket.GetStream();
-
-					if (networkStream.DataAvailable)
-					{
-						//ByteBuffer buffer = new ByteBuffer();
-						buffer = new ByteBuffer();
-						networkStream.Read(bytesFrom, 0, 4096);
-						buffer.WriteBytes(bytesFrom);
-
-						int packageID = buffer.ReadInt();
-						if (packageID == 4)
-						{
-							Console.WriteLine("Movement apckage received");
-							Console.WriteLine(buffer.ToString());
-						}
-						HandleMessage(packageID, buffer.ReadInt(),buffer.ToArray()); //Maybe use ref instead of sending a byte array to save memory and a bit of performance
-						
-						/*string msg = "";
-						//int id = buffer.ReadInt();
-						//string msg = id + " : ";
-						/*msg += buffer.ReadString();
-						buffer = new ByteBuffer();
-						//dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
-						//dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
-						Console.WriteLine(" >> " + "From client-" + clNo + msg);
-						buffer.WriteString(msg);
-						networkStream.Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-						networkStream.Flush();*/
-					}
-
-
-					/*rCount = Convert.ToString(requestCount);
-					serverResponse = "Server to clinet(" + clNo + ") " + rCount;
-					sendBytes = Encoding.ASCII.GetBytes(serverResponse);
-					networkStream.Write(sendBytes, 0, sendBytes.Length);
-					networkStream.Flush();
-					Console.WriteLine(" >> " + serverResponse);*/
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine(" >> " + ex.ToString());
-				}
-			}
-		}
-		static void HandleMessage(int mID,int id, byte[] data)
-		{
-			switch (mID)
-			{
-				case (int)Enums.AllEnums.SSyncingPlayerMovement:
-					Console.WriteLine("Packet movement: "+id);
-					SendToAllBut(id, data);
-					break;
-				case (int)Enums.AllEnums.SSendingMessage:
-					SendToAllBut(id, data);
-					break;
-			}
-		}
-			
-		static void Handledata(int id, string msg)
-		{
-			for (int i = 0; i < 20; i++)
-			{
-				if (i != id)
-				{
-					Globals.clients[i].GetStream().Write(Encoding.ASCII.GetBytes(msg), 0, Encoding.ASCII.GetBytes(msg).Length);
-				}
-			}
-		}
-
-		static void NotifyMainPlayerOfAlreadyConnected(int id) // sends already connected to players current player
-		{
-			for (int i = 0; i < 20; i++)
-			{
-				if (Globals.clients[i] != null && Globals.clients[i].Connected)
-				{
-					if (i != id)
-					{
-						Console.WriteLine(i);
-						ByteBuffer buffer = new ByteBuffer();
-						buffer.WriteInt((int)Enums.AllEnums.SSendingAlreadyConnectedToMain);
-						buffer.WriteInt(i);
-						Thread.Sleep(100); //If the thread doesnt sleep, the packet is not sent
-						//Console.WriteLine(Globals.clients[id].GetStream().);
-						Globals.clients[id].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-						Globals.clients[id].GetStream().Flush();
-						Console.WriteLine("Sending sync to "+id);
-					}
-				}
-			}
-		}
-
-		static void NotifyAlreadyConnected(int id) // sends current player to already connected player 
-		{
-			ByteBuffer buffer = new ByteBuffer();
-			buffer.WriteInt((int)Enums.AllEnums.SSendingMainToAlreadyConnected);
-			buffer.WriteInt(id);
-			for (int i = 0; i < 20; i++)
-			{
-				if (Globals.clients[i] != null && Globals.clients[i].Connected)
-				{
-					if (i != id)
-					{
-						Globals.clients[i].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-						Globals.clients[i].GetStream().Flush();
-					}
-				}
-			}
-		}
-
-		static void SendToAllBut(int id, byte[] data)
-		{
-			ByteBuffer buffer = new ByteBuffer();
-			buffer.WriteBytes(data);
-
-			for (int i = 0; i < 20; i++)
-			{
-				if (Globals.clients[i] != null && Globals.clients[i].Connected)
-				{
-					if (i != id)
-					{
-						Console.WriteLine("Sending move from "+id+" to " + i);
-						Console.WriteLine(i);
-						Globals.clients[i].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-						Globals.clients[i].GetStream().Flush();
-					}
-				}
-			}
-		}
-
-		static void SendMessage()
-		{ }
-	}
-
 	class HttpServer
 	{
 		private HttpListener httpListener;
-		private ArrayList jobs;
-		public HttpServer(int port, ref ArrayList job)
+		private TcpClient client = new TcpClient();
+		public HttpServer(int port)
 		{
 			httpListener = new HttpListener();
-			httpListener.Prefixes.Add("http://localhost:"+port+"/");
-			jobs = job;
+			httpListener.Prefixes.Add("http://127.0.0.1:" + port + "/");
+
+			client.Connect("", 5000);
 		}
 
 		public void Run()
 		{
+
 			httpListener.Start();
-			var context = httpListener.GetContext(); // The contexts(request) has a field rawUrl and httpMethod that encapsulates the url and method(post,get...)
+			Console.WriteLine(">> HTTP Server started ");
 
-			switch (context.Request.HttpMethod)
+			while (true)
 			{
-				case "GET":
+				var context = httpListener.GetContext(); // The contexts(request) has a field rawUrl and httpMethod that encapsulates the url and method(post,get...)
+				if (context.Request.HttpMethod == "OPTIONS")
+				{
+					SendToClient(context, "", 200);
+					continue;
+				}
+				string token = context.Request.Headers["authorization"];
+				if (true) //validate token
+				{
+					switch (context.Request.HttpMethod)
 					{
-						HandleGet(context);
-						break;
+						case "GET":
+							{
+								HandleGet(context, token);
+								break;
+							}
+						case "POST":
+							{
+								HandlePost(context, token);
+								break;
+							}
+
 					}
-				case "POST":
-					{
-						HandlePost(context);
-						break;
-					}
+				}
+				else
+				{
+					SendToClient(context, "{ error: \"Authentication failed\"}", 404);
+				}
 			}
-			/*var response = context.Response;
-			const string responseString = "<html><body>Hello world</body></html>";
-			var buffer = Encoding.UTF8.GetBytes(responseString);
-			response.ContentLength64 = buffer.Length;
-			var output = response.OutputStream;
-			output.Write(buffer, 0, buffer.Length);
 
-			Console.WriteLine(output);
-
-			output.Close();
-
-			//Console.ReadKey();*/
 		}
 
-		private void HandleGet(HttpListenerContext response)
+		private void HandleGet(HttpListenerContext response, string token)
 		{
-			switch (response.Request.RawUrl)
+			switch (response.Request.Url.LocalPath)
 			{
 				case "/listPlayers":
 					{
+						Console.WriteLine(">> Received listPlayers request");
+						ListPlayers(response, token);
 						break;
 					}
-				case "/toDo":
+				case "/restartServer":
 					{
+						Console.WriteLine(">> Received restartServer request");
+						RestartServer(response, token);
+						break;
+					}
+				case "/getSettings":
+					{
+						Console.WriteLine(">> Received getSettings request");
+						GetSettings(response, token);
+						break;
+					}
+				default:
+					{
+						string json = "{ error: \"Not found\"}";
+						SendToClient(response, json, 404);
 						break;
 					}
 			}
 		}
 
-		private void HandlePost(HttpListenerContext response)
+		private void HandlePost(HttpListenerContext response, string token)
 		{
 			switch (response.Request.RawUrl)
 			{
-				case "/broadcastMessage":
+				case "/changeSettings":
 					{
-						Stream body = response.Request.InputStream;
-						body.
+						Console.WriteLine(">> Received changeSettings request");
+						ChangeSettings(response, token);
 						break;
 					}
-				case "/changePlayerScore":
+				case "/kickPlayer":
 					{
+						Console.WriteLine(">> Received kickPlayer request");
+						KickPlayer(response, token);
+						break;
+					}
+				default:
+					{
+						SendToClient(response, "{ error: \"Not found\"}", 404);
 						break;
 					}
 			}
 		}
 
-		private void BroadcastMessage(String msg)
+		/// <summary>
+		/// Sends new configuration to game server
+		/// </summary>
+		/// <param name="response">Underlaying in and out streams</param>
+		/// <param name="token">Token for authentication</param>
+		private void ChangeSettings(HttpListenerContext response, string token)
 		{
-			jobs.Add(msg);
+			var requestBody = response.Request.InputStream;
+			byte[] data = new byte[4096];
+			requestBody.Read(data, 0, (int)(response.Request.ContentLength64));
+			string msg = Encoding.UTF8.GetString(data);
+			ChangeSettingsJson csj = JsonConvert.DeserializeObject<ChangeSettingsJson>(msg);
+
+			ByteBuffer buffer = new ByteBuffer();
+
+			buffer.WriteByte((int)EnumsServer.Enums.AllEnums.HChangeSettings); //mudar
+			buffer.WriteInt(csj.concurrent_players);
+			buffer.WriteInt(csj.port);
+			buffer.WriteByte(Convert.ToByte(csj.restart));
+			SendToGameServer(buffer.ToArray());
+
+			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
+
+			client.GetStream().Read(data, 0, 1);
+
+			SendToClient(response, "{\"success\":" + Convert.ToBoolean(data[0]) + "}",200);
+		}
+
+		private void ListPlayers(HttpListenerContext response, string token)
+		{
+			List<byte> data = new List<byte>();
+			data.Add((int)EnumsServer.Enums.AllEnums.HListPlayers);
+			data.AddRange(BitConverter.GetBytes(Encoding.ASCII.GetBytes(token).Length));
+			data.AddRange(Encoding.ASCII.GetBytes(token));
+			
+			SendToGameServer(data.ToArray());
+
+			//response:
+			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
+
+			byte[] dataFromServer = new byte[4096];
+			client.GetStream().Read(dataFromServer, 0, dataFromServer.Length);
+			//if (dataFromServer[0] == 1 && dataFromServer[4]==0) goto response;
+			string json = ConvertToJson(dataFromServer);
+
+			SendToClient(response,json,200);
+		}
+
+		/// <summary>
+		/// Gets game server current configuration
+		/// </summary>
+		/// <param name="response">Underlaying in and out streams</param>
+		/// <param name="token">Token for authentication</param>
+		private void GetSettings(HttpListenerContext response, string token)
+		{
+			List<byte> buffer = new List<byte>();
+			buffer.Add((int)EnumsServer.Enums.AllEnums.HGetSettings); //Mudar
+			buffer.AddRange(BitConverter.GetBytes(Encoding.ASCII.GetBytes(token).Length));
+			buffer.AddRange(Encoding.ASCII.GetBytes(token));
+			SendToGameServer(buffer.ToArray());
+
+
+			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
+
+			byte[] dataFromServer = new byte[4096];
+			client.GetStream().Read(dataFromServer, 0, dataFromServer.Length);
+
+			ByteBuffer bf = new ByteBuffer();
+			bf.WriteBytes(dataFromServer);
+
+			string json = "{\"port\":" + bf.ReadInt() + ", \"concurrent_players\":" + bf.ReadInt() + "}";
+
+			SendToClient(response, json, 200);
+			
+		}
+
+		private void KickPlayer(HttpListenerContext response, string token)
+		{
+			var requestBody = response.Request.InputStream;
+			byte[] data = new byte[4096];
+			requestBody.Read(data, 0, (int)(response.Request.ContentLength64));
+			string json = Encoding.ASCII.GetString(data);
+			KickPlayerJson p = JsonConvert.DeserializeObject<KickPlayerJson>(json);
+
+			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteByte((int)EnumsServer.Enums.AllEnums.HKickPlayer); 
+			buffer.WriteString(token); 
+			buffer.WriteString(p.player_ID);
+			buffer.WriteString(p.char_ID);
+			SendToGameServer(buffer.ToArray());
+
+			/*while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
+
+			byte aux = (byte)client.GetStream().ReadByte();*/
+			byte aux = 1;
+			if (aux == 1)	
+				json = "{ \"success\" : true }";
+			else
+				json = "{ \"success\" : false }";
+
+			SendToClient(response, json, 200);
+
+		}
+
+		private void RestartServer(HttpListenerContext response, string token)
+		{
+			List<byte> buffer = new List<byte>();
+			buffer.Add((int)EnumsServer.Enums.AllEnums.HRestartServer); //Same as writting a short
+			buffer.AddRange(BitConverter.GetBytes(Encoding.ASCII.GetBytes(token).Length));
+			buffer.AddRange(Encoding.ASCII.GetBytes(token));
+
+			SendToGameServer(buffer.ToArray());
+
+			while (!client.GetStream().DataAvailable) { Thread.Sleep(50); }
+
+			byte data = (byte)client.GetStream().ReadByte();
+			string json = "{ success : " + Convert.ToBoolean(data) + " }";
+
+			SendToClient(response, json, 200);
+		}
+
+		private void SendToGameServer(byte[] data)
+		{
+			client.GetStream().Write(data, 0, data.Length);
+			client.GetStream().Flush();
+		}
+
+		private string ConvertToJson(byte[] data)
+		{
+			List<PlayerJson> players = new List<PlayerJson>();
+			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteBytes(data);
+
+			int numberPlayers = buffer.ReadInt();
+			if (numberPlayers == 0) return "";
+			for (int i = 0; i < numberPlayers; i++)
+			{
+				PlayerJson p = new PlayerJson();
+				p.username = buffer.ReadString();
+				p.char_name = buffer.ReadString();
+				p.player_IP = buffer.ReadString();
+				p.current_playtime = buffer.ReadInt();
+				//p.total_playtime = buffer.ReadInt();
+
+				players.Add(p);
+			}
+
+			return JsonConvert.SerializeObject(players);
+		}
+
+		private void SendToClient(HttpListenerContext response, string json, int httpcode)
+		{
+			byte[] buffer = Encoding.UTF8.GetBytes(json);
+
+			response.Response.ContentLength64 = buffer.Length;
+			response.Response.StatusCode = httpcode;
+			response.Response.AddHeader("Content-Type", "application/json");
+			response.Response.ContentType = "application/json";
+			response.Response.AddHeader("Access-Control-Allow-Origin", "*");
+			response.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, authorization");
+			response.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST");
+			response.Response.ContentType = "application/json";
+			var output = response.Response.OutputStream;
+			output.Write(buffer, 0, buffer.Length);
+			output.Flush();
 		}
 	}
+
+	class PlayerJson
+	{
+		public string username { get; set; }
+		public string char_name { get; set; }
+		public string player_IP { get; set; }
+		public int current_playtime { get; set; }
+		public int total_playtime { get; set; }
+	}
+
+	class ChangeSettingsJson
+	{
+		public int port { get; set; }
+		public int concurrent_players { get; set; }
+		public bool restart { get; set; }
+	}
+
+	class KickPlayerJson
+	{
+		public string player_ID { get; set; }
+		public string char_ID { get; set; }
+	}
+
+	/*
+	 *	Default response
+	 *	{}
+	 */
 
 }

@@ -10,6 +10,8 @@ using MongoDB.Driver;
 using System.IO;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using TCPServer;
+using System.Linq.Expressions;
 
 namespace ServerEcho
 {
@@ -64,11 +66,14 @@ namespace ServerEcho
 
 			int nOfPlayers = int.Parse(line.Substring(line.LastIndexOf('=') + 1));
 			Globals.ChangeNoOfPlayers(nOfPlayers);
+
+			DB db = DB.getInstance("mongodb://admin:admin@ds221339.mlab.com:21339/project-dome", "GameDB");
 		}
 
 		static void Main(string[] args)
 		{
-			TCP_Server tcp = new TCP_Server("D://config.txt");
+			
+			TCP_Server tcp = new TCP_Server("config.txt");
 			tcp.Start();
 			
 		}
@@ -100,10 +105,11 @@ namespace ServerEcho
 
 			int counter = 0;
 
-			JwtTokens.LoadKey("D://key.txt");
+			JwtTokens.LoadKey("key.txt");
 			
 			serverstart:
 			serverSocket.Start();
+			Globals.dicPlayers = new Dictionary<int, Player>();
 			Console.WriteLine(">> TCP IP Server Started on port "+ Globals.port);
 			while (Globals.mainRun)
 			{
@@ -167,18 +173,17 @@ namespace ServerEcho
 
 		public void startClient(TcpClient inClientSocket, int clineNo, string ip)
 		{
+			this.ip = ip;
 			this.clientSocket = inClientSocket;
 			this.clNo = clineNo;
 			Thread ctThread = new Thread(doClient);
 			ctThread.Start();
-			this.ip = ip;
 		}
 
 		private void doClient() 
 		{
 			int requestCount = 0;
 			byte[] bytesFrom = new byte[4096];
-			bool run = true;
 			requestCount = 0;
 			NetworkStream networkStream = clientSocket.GetStream();
 
@@ -207,7 +212,7 @@ namespace ServerEcho
 			pl.cloths = buffer.ReadInt();
 			pl.currentPlaytime = DateTime.Now;
 			pl.playerIP = ip;
-			//pl.totalPlaytime = buffer.ReadInt();
+			pl.totalPlaytime = DB.getInstance("","").GetPlayTime(pl.uName);
 			pl.socketID = clNo;
 			
 			Globals.dicPlayers.Add(clNo, pl);
@@ -233,13 +238,11 @@ namespace ServerEcho
 						networkStream.Read(bytesFrom, 0, 4096);
 						buffer.WriteBytes(bytesFrom);
 
-						//buffer.ReadInt(); // ignoring package size
 						int packageID = buffer.ReadInt();
 
 						if (packageID == (int)Enums.AllEnums.SCloseConnection)
 						{
 							run = false;
-							//CloseConnection(clNo);
 							break;
 						}
 
@@ -252,10 +255,22 @@ namespace ServerEcho
 				}
 				catch (Exception ex)
 				{
-					//Console.WriteLine(">> Closing connection from player " + Globals.dicPlayers[clNo].uName);
-					//Globals.clients[clNo] = null;
-					//Globals.dicPlayers.Remove(clNo);
-					run = false;
+					try
+					{
+						if (!Globals.clients[clNo].Connected)
+						{
+							SCloseConnection(clNo);
+						}
+						Globals.clients[clNo] = null;
+					}
+					catch (Exception e) { }
+					finally
+					{
+						byte[] closeBuffer = new byte[5];
+						closeBuffer[0] = 7;
+						closeBuffer[4] = (byte)clNo;
+						run = false;
+					}
 				}
 			}
 
@@ -268,7 +283,6 @@ namespace ServerEcho
 			{
 				case (int)Enums.AllEnums.SSyncingPlayerMovement:
 					{
-						//Console.WriteLine("received sync from "+id);
 						SendToAllBut(id, data);
 						break;
 					}
@@ -282,7 +296,35 @@ namespace ServerEcho
 						SendMessage(id, data);
 						break;
 					}
+				case (int)Enums.AllEnums.SCloseConnection:
+					{
+						SCloseConnection(id);
+						break;
+					}
 			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="id"></param>
+		static void SCloseConnection(int id)
+		{
+			ByteBuffer buffer = new ByteBuffer();
+			buffer.WriteInt((int)Enums.AllEnums.SCloseConnection);
+			buffer.WriteString(Globals.dicPlayers[id].uName);
+
+			SendToAllBut(id, buffer.ToArray());
+
+			Globals.clients[id].Client.Close();
+			Globals.clients[id] = null;
+			Console.WriteLine(">> Closing connection from player " + Globals.dicPlayers[id].uName);
+			DB.getInstance("", "").UpdatePlayerPlayTime(Globals.dicPlayers[id]);
+			try
+			{
+				Globals.dicPlayers.Remove(id);
+			}
+			catch (Exception) { }
 		}
 
 		/// <summary>
@@ -300,7 +342,6 @@ namespace ServerEcho
 					{
 						Console.WriteLine(i);
 						ByteBuffer buffer = new ByteBuffer();
-						//buffer.WriteInt(0);
 						buffer.WriteInt((int)Enums.AllEnums.SSendingAlreadyConnectedToMain);
 						buffer.WriteString(Globals.dicPlayers[i].uName);
 						buffer.WriteString(Globals.dicPlayers[i].cName);
@@ -311,10 +352,12 @@ namespace ServerEcho
 						buffer.WriteFloat(Globals.dicPlayers[i].cY);
 						buffer.WriteFloat(Globals.dicPlayers[i].cZ);
 						Thread.Sleep(1000); //If the thread doesnt sleep, the packet is not sent
-						//Console.WriteLine(buffer.ToArray().Length+" to "+id);
-						Globals.clients[id].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-						//Globals.clients[id].GetStream().Flush();
-						//Console.WriteLine("Sending sync to "+id);
+											//Console.WriteLine(buffer.ToArray().Length+" to "+id);
+						try
+						{
+							Globals.clients[id].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
+						}
+						catch (Exception) { continue; }
 					}
 				}
 			}
@@ -342,8 +385,13 @@ namespace ServerEcho
 				{
 					if (i != id)
 					{
-						Globals.clients[i].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
-						Globals.clients[i].GetStream().Flush();
+						try
+						{
+							Globals.clients[i].GetStream().Write(buffer.ToArray(), 0, buffer.ToArray().Length);
+							Globals.clients[i].GetStream().Flush();
+						}
+						catch (Exception) { continue; }
+						
 					}
 				}
 			}
@@ -360,11 +408,12 @@ namespace ServerEcho
 			{
 				if (Globals.clients[i] != null && Globals.clients[i].Connected)
 				{
-					if (i != id)
-					{
-						Globals.clients[i].GetStream().Write(data, 0, data.Length);
-						Globals.clients[i].GetStream().Flush();
-					}
+					try
+						{
+							Globals.clients[i].GetStream().Write(data, 0, data.Length);
+							Globals.clients[i].GetStream().Flush();
+						}
+						catch (Exception) { continue; }
 				}
 			}
 		}
@@ -378,9 +427,13 @@ namespace ServerEcho
 		{
 			if (Globals.clients[id] != null && Globals.clients[id].Connected)
 			{
-				Globals.clients[id].GetStream().Write(data, 0, data.Length);
-				Globals.clients[id].GetStream().Flush();
-				
+				try
+				{
+					Globals.clients[id].GetStream().Write(data, 0, data.Length);
+					Globals.clients[id].GetStream().Flush();
+				}
+				catch (Exception) { }
+
 			}
 			
 		}
@@ -408,13 +461,16 @@ namespace ServerEcho
 							break;
 						}
 					}
-					catch (IndexOutOfRangeException) { break; }
+					catch (Exception) { break; }
 				}
 			
 		}
 
 	}
 
+	/// <summary>
+	/// Class responsible to authenticate token
+	/// </summary>
 	public static class JwtTokens
 	{
 		private static string key;
@@ -446,32 +502,45 @@ namespace ServerEcho
 	/// </summary>
 	public class DB //Singleton
 	{
-		private DB _db;
-		private IMongoDatabase mongodb;
-		MongoClient client;
+		private static DB _db;
+		private static IMongoDatabase mongodb;
+		static MongoClient client;
 
 		private DB() { }
-		public DB getInstance(string path, string dbName)
+		public static DB getInstance(string path, string dbName)
 		{
 			if (_db == null)
 			{
 				_db = new DB();
-				client = new MongoClient(path); // "mongodb://localhost:27017"
-				mongodb = client.GetDatabase(dbName);
+
+				client = new MongoClient(path);
+				mongodb = client.GetDatabase("project-dome");
 			}
 
 			return _db;
 		}
-		public Player GetPlayer(string uName,string cName)
-		{
-			var coll = mongodb.GetCollection<Player>(""); //collection's name in db
-
-			var p = coll.Find(pl => pl.uName == uName && pl.cName==cName);
 		
-			return (Player)p;
-		}
+		/// <summary>
+		/// Gets the total play time from the DB
+		/// </summary>
+		/// <param name="uName">user name</param>
+		/// <returns>play time</returns>
+		public int GetPlayTime(string uName)
+		{
+			IMongoCollection<UserOnDB> collection = mongodb.GetCollection<UserOnDB>("users");
 
-		public void UpdatePlayer(Player p)
+			//IMongoCollection<BsonDocument> collection = mongodb.GetCollection<BsonDocument>("users");
+			Expression<Func<UserOnDB, bool>> filter = x => x.Username.Contains(uName);
+			UserOnDB player = collection.Find(filter).FirstOrDefault();
+
+			return player.Playtime;
+		}
+		
+		/// <summary>
+		/// Updates player total playtime
+		/// </summary>
+		/// <param name="p">Reference to the player</param>
+		public void UpdatePlayerPlayTime(Player p)
 		{
 			var collection = mongodb.GetCollection<BsonDocument>("users");
 
@@ -482,6 +551,7 @@ namespace ServerEcho
 
 			collection.UpdateOne(filter, update);
 		}
+
 	}
 
 	/// <summary>
@@ -491,20 +561,22 @@ namespace ServerEcho
 	public class HandleHttpClient
 	{
 		private TcpClient clientSocket;
-		private int clNo;
+		static private int clNo;
+		bool run = false;
 
 		public void StartHttpClient(TcpClient inClientSocket, int clineNo)
 		{
 			this.clientSocket = inClientSocket;
-			this.clNo = clineNo;
+			clNo = clineNo;
 			Thread ctThread = new Thread(HandleClient);
+			run = true;
 			ctThread.Start();
 		}
 
 		private void HandleClient()
 		{
 			byte[] bytesFrom = new byte[4096];
-			bool run = true;
+			
 			NetworkStream networkStream = clientSocket.GetStream();
 
 			while (run)
@@ -518,7 +590,9 @@ namespace ServerEcho
 				short id=buffer.ReadByte();
 				string token = buffer.ReadString();
 				if (!JwtTokens.EvaluateToken(token))
-				{ }
+				{
+					SendDefaultRespose(false, clNo);
+				}
 				else { HandleID(id, bytesFrom); }
 			}
 		}
@@ -557,7 +631,6 @@ namespace ServerEcho
 		}
 
 		/// <summary>
-		/// **************Change file path*******************
 		/// Changes the server's cofiguration file
 		/// </summary>
 		/// <param name="data">Byte array containing new server configuration</param>
@@ -568,19 +641,21 @@ namespace ServerEcho
 			buffer.ReadByte();
 			int nOfPlayers = buffer.ReadInt();
 			int port = buffer.ReadInt();
-
+			byte restart = buffer.ReadByte();
 			string configFile = "port=" + port+ System.Environment.NewLine+"NumberOfPlayers=" +nOfPlayers;
 			try
 			{
-				StreamWriter writer = new StreamWriter("D://config.txt");
+				StreamWriter writer = new StreamWriter("config.txt");
 				writer.Write(configFile);
 				writer.Close();
 			}
 			catch (Exception)
 			{
-				SendDefaultRespose(false);
+				SendDefaultRespose(false, clNo);
 			}
-			SendDefaultRespose(true);
+			SendDefaultRespose(true, clNo);
+
+			if (restart == 1) HRestartServer();
 		}
 
 		/// <summary>
@@ -589,7 +664,7 @@ namespace ServerEcho
 		private void HGetSettings()
 		{
 			List<byte> buffer = new List<byte>();
-			StreamReader reader = new StreamReader("D:\\config.txt");
+			StreamReader reader = new StreamReader("config.txt");
 			string line = reader.ReadLine();
 			int aux= int.Parse(line.Substring(line.LastIndexOf('=') + 1));
 			buffer.AddRange(BitConverter.GetBytes(aux));
@@ -607,7 +682,6 @@ namespace ServerEcho
 		}
 
 		/// <summary>
-		/// ********NOT FISHED*********
 		/// Closes the connection of a specific player
 		/// </summary>
 		private void HKickPlayer(byte[] data)
@@ -617,21 +691,16 @@ namespace ServerEcho
 			buffer.ReadByte();
 			buffer.ReadString();
 			string playerid = buffer.ReadString();
-			for (int i = 0; i < Globals.dicPlayers.Count; i++)
+
+			foreach (Player p in Globals.dicPlayers.Values)
 			{
-				if (Globals.dicPlayers[i].uName == playerid)
+				if (p.uName == playerid)
 				{
-					//update playtime on db
-					//update index
-					CloseConnection(i);
-					/*Globals.clients[i].Close();
-					Globals.clients[i] = null;*/
-					//Globals.i = i
+					CloseConnection(p.socketID);
 					break;
 				}
 			}
-
-			SendDefaultRespose(true);
+			//SendDefaultRespose(true,clNo);
 		}
 		
 		/// <summary>
@@ -675,16 +744,14 @@ namespace ServerEcho
 			client.Connect("", Globals.port);
 			client.Close();
 
-			SendDefaultRespose(true);
+			SendDefaultRespose(true, clNo);
 		}
 
-		private void SendDefaultRespose(bool success)
-		{
-			byte[] buffer = new byte[1];
-			buffer = BitConverter.GetBytes(success);
-			Globals.httpClient[clNo].GetStream().Write(buffer, 0, buffer.Length);
-		}
-
+		/// <summary>
+		/// Send an default boolean response to http Server
+		/// </summary>
+		/// <param name="success">Bool if method failed or not</param>
+		/// <param name="id">if of which connection from the http the bytearray has to be sent</param>
 		private static void SendDefaultRespose(bool success, int id)
 		{
 			byte[] buffer = new byte[1];
@@ -692,7 +759,10 @@ namespace ServerEcho
 			Globals.httpClient[id].GetStream().Write(buffer, 0, buffer.Length);
 		}
 
-		//UPDATE DB
+		/// <summary>
+		/// Remove all player reference from memory and closes the connection
+		/// </summary>
+		/// <param name="id">Player id</param>
 		static void CloseConnection(int id)
 		{
 			ByteBuffer buffer = new ByteBuffer();
@@ -700,13 +770,18 @@ namespace ServerEcho
 			buffer.WriteString(Globals.dicPlayers[id].uName);
 
 			HandleClinet.SendToAllBut(id, buffer.ToArray());
-			//Globals.dicPlayers.Remove(id);
+
 			Globals.clients[id].Client.Close();
 			Globals.clients[id] = null;
 			Console.WriteLine(">> Closing connection from player " + Globals.dicPlayers[id].uName);
-			Globals.dicPlayers.Remove(id);
-			SendDefaultRespose(true, id);
-			//Update player playtime
+			DB.getInstance("","").UpdatePlayerPlayTime(Globals.dicPlayers[id]);
+			try
+			{
+				Globals.dicPlayers.Remove(id);
+			}
+			catch (Exception) { }
+			//SendDefaultRespose(true, clNo);
+			
 		}
 	}
 }
